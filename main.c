@@ -30,33 +30,30 @@
    /* +---+---+---+---+---+---+---+---+---+---+ */
 #include <stdio.h>
 
-void display_map(int *map, int s);
-void clear_map(int *map, int s);
+void display_map(char *map, int s);
+void clear_map(char *map, int s);
 
 int main() {
 	printf("Hello world\n");
 
-	int map_size = 3;
-	int map_chars[map_size][map_size];
+	int map_size = 4;
+	char map_chars[map_size][map_size];
 
 	clear_map(&map_chars[0][0], map_size);
-	//display_map(&map_chars, map_size);
+	display_map(&map_chars[0][0], map_size);
 	return 0;
 }
 
-void clear_map(int *map, int s) {
+void clear_map(char *map, int s) {
 	for (int i = 0 ; i < s; i++) {
 		for (int j = 0 ; j < s; j++) {
 			int index = i*s + j;
-			/* *(*(map + i) + j) = 'a'; */
-			/* map[index] = 'a'; */
-			printf("Setting map %d, %d to 1 at index %d\n", i,j, index);
-			map[index] = 1;
+			*(map + index) = 'a';
 		}
 	}
 }
 
-void display_map(int *map, int s) {
+void display_map(char *map, int s) {
 	// Display the map in a temrinal board fashion, with numbers so it is easy to read
 	// This is the format:
 	//
@@ -85,11 +82,13 @@ void display_map(int *map, int s) {
 	// TODO: implement it the proper way
 	/* printf("   "); //Empty 3 spaces for top left corner */
 
+	printf("Displaying map\n\n");
+
 	for (int i = 0 ; i < s; i++) {
 		for (int j = 0 ; j < s; j++) {
 			int index = i*s + j;
 			/* printf("%c", *(*(map+i)+j)); */
-			printf("%d", map[index]);
+			printf("%c", map[index]);
 
 		}
 		printf("\n");
