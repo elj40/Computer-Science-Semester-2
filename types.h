@@ -62,7 +62,7 @@ struct Map {
 	char map[MAX_MAP_SIZE][MAX_MAP_SIZE];
 	int hive_len;
 	int flower_len;
-	struct Hive hives[MAX_MAP_SIZE*MAX_MAP_SIZE];
-	struct Flower flowers[MAX_MAP_SIZE*MAX_MAP_SIZE];
+	// struct Hive hives[MAX_MAP_SIZE*MAX_MAP_SIZE];
+	// struct Flower flowers[MAX_MAP_SIZE*MAX_MAP_SIZE];
 };
 #endif
