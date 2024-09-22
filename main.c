@@ -8,10 +8,6 @@
 /* Board objects¶ */
 /* Each line after the first line will begin to describe the configuration of a single map object, which can be a flower, or a hive. Your program must validate the setup of each board object, and report the following error message if there are any violations: */
 
-
-/* ERROR: Invalid object setup on line <line> */
-/* Where <line> is the line number in the configuration file where the setup is invalid. If the setup is invalid due to abruptly reaching the end of the file, the last line number of the file should be reported using the error message above. */
-
 /* If an attempt is made to place an object (a flower or a hive) on a position that is already occupied, the appropriate error message from the following must be reported: */
 
 /* ERROR: Cannot place flower at already occupied location (<row>, <col>) */
@@ -19,25 +15,6 @@
 /* ERROR: Cannot place hive at already occupied location (<row>, <col>) */
 
 /* Where <row> and <col> are the row and column of the location that is already occupied. */
-
-/* Flower¶ */
-/* A flower is a map element that contains pollen which bees can pick up. The input for a flower consists of a line describing the flowers configuration, followed by n lines, describing each pollen granule. The flower configuration line consists of the following, separated by a single space character: */
-
-/* The character 'F', denoting a flower placement. */
-
-/* The x coordinate of the flower (integer). */
-
-/* The y coordinate of the flower (integer). */
-
-/* The number (n) of pollen granules the flower contains (integer). The line describing the flower will be followed by n lines containing the information for each pollen granule in the flower. */
-
-/* An example of a flower input is as follows: */
-
-
-/* F 20 50 2 */
-/* Hello, */
-/* world! */
-/* which describes a flower at x=20, y=50, with 2 pollen granules, one containing the string ‘Hello,‘ and the other containing the string ‘world!’ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -55,7 +32,7 @@
 #define BEE_MAX_CHARS 50
 
 void clear_map(char *map, int s);
-void read_map(char *map, enum PollenType pollen_type, enum BeehiveAction beehive_action);
+void read_map(char *map, int map_size, enum PollenType pollen_type, enum BeehiveAction beehive_action);
 void invalid_object_setup(int l);
 
 int main(int argc, char* argv[]) {
@@ -82,13 +59,13 @@ int main(int argc, char* argv[]) {
 	char map[map_size][map_size];
 
 	clear_map(&map[0][0], map_size);
-	read_map(&map[0][0], pollen_type, beehive_action);
+	read_map(&map[0][0], map_size, pollen_type, beehive_action);
 
 	/* display_map(&map[0][0], map_size); */
 	return 0;
 }
 
-void read_map(char *map, enum PollenType pollen_type, enum BeehiveAction beehive_action) {
+void read_map(char *map, int map_size, enum PollenType pollen_type, enum BeehiveAction beehive_action) {
 	int current_line = 2;
 	char line[CONFIG_LINE_LEN];
 
@@ -111,6 +88,11 @@ void read_map(char *map, enum PollenType pollen_type, enum BeehiveAction beehive
 		printf("y parsed correctly\n");
 		if (!string_to_int(&n, tokens[3])) invalid_object_setup(current_line);
 		printf("n parsed correctly\n");
+
+		if (*(map + y*map_size + x) != ' ') {
+			printf("ERROR: Cannot place flower at already occupied location (%d, %d)\n", y, x);
+			exit(0);
+		}
 
 		int speed;
 		int perception;
