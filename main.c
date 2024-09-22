@@ -47,13 +47,15 @@
 #include "validate.h"
 #include "utils.h"
 #include "display.h"
+#include "types.h"
 
 #define CONFIG_LINE_LEN 50
 #define CONFIG_OPTIONS_LEN 4
 #define POLLEN_MAX_CHARS 50
+#define BEE_MAX_CHARS 50
 
 void clear_map(char *map, int s);
-void read_map(char *map, int pollen_type, int beehive_action);
+void read_map(char *map, enum PollenType pollen_type, enum BeehiveAction beehive_action);
 void invalid_object_setup(int l);
 
 int main(int argc, char* argv[]) {
@@ -66,16 +68,16 @@ int main(int argc, char* argv[]) {
 	if (fgets(config_line, CONFIG_LINE_LEN, stdin) == NULL)
 		return 0;
 
-
-	//TODO: convert pollen_type and beehive_action to enums
-	int map_size, duration, pollen_type, beehive_action;
-
+	int map_size, duration; 
+	enum PollenType pollen_type;
+	enum BeehiveAction beehive_action;
 
 	if (!validate_config_line(config_line, CONFIG_LINE_LEN, &map_size, &duration, &pollen_type, &beehive_action)) {
 		printf("ERROR: Invalid configuration line\n");
 		return 0;
 	}
 
+	printf("pollen type %d\n", pollen_type);
 
 	char map[map_size][map_size];
 
@@ -86,43 +88,96 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 
-void read_map(char *map, int pollen_type, int beehive_action) {
+void read_map(char *map, enum PollenType pollen_type, enum BeehiveAction beehive_action) {
 	int current_line = 2;
 	char line[CONFIG_LINE_LEN];
 
 	while (fgets(line, CONFIG_LINE_LEN, stdin) != NULL) {
+
 		char *tokens[CONFIG_OPTIONS_LEN];
 		split_string(tokens, CONFIG_LINE_LEN, line, " \n");
 
-		char *object = tokens[0];
+		char *object_tok = tokens[0];
+		int object_len = strlen(object_tok);
+		printf("Size of object string: %d, %s\n", object_len, object_tok);
+		if (object_len != 1) invalid_object_setup(current_line);
 
-		if (strcmp(object, "F") == 0) {
-			
-			int x, y, n;
-			if (!string_to_int(&x, tokens[1])) invalid_object_setup(current_line);
-			if (!string_to_int(&y, tokens[2])) invalid_object_setup(current_line);
-			if (!string_to_int(&n, tokens[3])) invalid_object_setup(current_line);
+		char object = object_tok[0];
 
-			printf("Making flower at %d, %d with %d pollen\n", x, y, n);
+		int x, y, n; 
+		if (!string_to_int(&x, tokens[1])) invalid_object_setup(current_line);
+		printf("x parsed correctly\n");
+		if (!string_to_int(&y, tokens[2])) invalid_object_setup(current_line);
+		printf("y parsed correctly\n");
+		if (!string_to_int(&n, tokens[3])) invalid_object_setup(current_line);
+		printf("n parsed correctly\n");
 
-			for (int i = 0; i < n; i++) {
+		int speed;
+		int perception;
+		switch(object) 	 {
+			case 'F':
+				printf("Making flower at %d, %d with %d pollen\n", x, y, n);
+
+				for (int i = 0; i < n; i++) {
+					current_line++;
+
+					char pollen_value[POLLEN_MAX_CHARS];
+					if (fgets(pollen_value, POLLEN_MAX_CHARS, stdin) == NULL) {
+						invalid_object_setup(current_line);
+					}
+
+					//Get rid of newline at end of pollen_value
+					char *pollen_v = strtok(pollen_value, "\n");
+					
+					if 	(pollen_type == 0) printf("Making float pollen: %s\n", pollen_v);
+					else if (pollen_type == 1) printf("Making string pollen: %s\n", pollen_v);
+					
+				}
+				break;
+			case 'B':
+			case 'D':
+			case 'H':
+				printf("Making hive at %d, %d with %d bees\n", x, y, n);
+				char bee_line[BEE_MAX_CHARS];
+				if (fgets(bee_line, BEE_MAX_CHARS, stdin) == NULL) {
+					invalid_object_setup(current_line);
+				}
 
 				current_line++;
 
-				char pollen_value[POLLEN_MAX_CHARS];
-				if (fgets(pollen_value, POLLEN_MAX_CHARS, stdin) == NULL) {
+				char *bee_tokens[2];
+				split_string(bee_tokens, 2, bee_line, " \n");
+
+				if (!string_to_int(&speed, bee_tokens[0])) invalid_object_setup(current_line);
+				if (!string_to_int(&perception, bee_tokens[1])) invalid_object_setup(current_line);
+
+				for (int i = 0; i < n; i++) {
+					 printf("Making bee-> speed:%d, percpeption:%d\n", speed, perception);
+				}
+				break;
+			case 'W':
+				printf("Making wasp hive at %d, %d with %d wasps\n", x, y, n);
+				char wasp_line[BEE_MAX_CHARS];
+				if (fgets(wasp_line, BEE_MAX_CHARS, stdin) == NULL) {
 					invalid_object_setup(current_line);
 				}
-				
-				if 	(pollen_type == 0) printf("Making float pollen: %s\n", pollen_value);
-				else if (pollen_type == 1) printf("Making string pollen: %s\n", pollen_value);
-				
-			}
 
+				current_line++;
 
+				char *wasp_tokens[2];
+				split_string(wasp_tokens, 2, wasp_line, " \n");
+
+				if (!string_to_int(&speed, wasp_tokens[0])) invalid_object_setup(current_line);
+
+				for (int i = 0; i < n; i++) {
+					 printf("Making wasp-> speed:%d\n", speed);
+				}
+				break;
+			default:
+				invalid_object_setup(current_line);
 		}
-		else if (strcmp(object, "B") == 0) {}
-		else invalid_object_setup(current_line);
+
+
 
 		printf("# %s\n", tokens[0]);
 		current_line++;
@@ -135,17 +190,6 @@ void invalid_object_setup(int l) {
 	exit(0);
 }
 
-/* bool validate_flower(char *map, char *tokens[], int cl, int pt) { */
-/* 	int x, y, n; */
-/* 	if (!string_to_int(&x, tokens[1])) return false; */
-/* 	if (!string_to_int(&y, tokens[2])) return false; */
-/* 	if (!string_to_int(&n, tokens[3])) return false; */
-
-/* 	for (int i = 0; i < n; i++) { */
-/* 		char *pollen_value; */
-/* 		if (fgets(pollen_value, POLLEN_MAX_CHARS, stdin) == NULL) return false; */
-/* 	} */
-/* } */
 
 void clear_map(char *map, int s) {
 	for (int i = 0 ; i < s; i++) {
