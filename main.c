@@ -70,6 +70,8 @@ int main(int argc, char* argv[]) {
 
 	display_map((char *)map.map, map.map_size);
 
+	printf("Map objects-> hives:%d, flowers:%d\n", map.hive_len, map.flower_len);
+
 	return 0;
 }
 
@@ -77,47 +79,47 @@ void add_hive(struct Map *m, struct Hive h) {
 	printf("Adding hive-> row: %3d, col: %3d\n", h.row, h.col);
 	m->map[h.row][h.col] = h.type;
 	
-	/* if (m->hive_len < MAX_MAP_SIZE*MAX_MAP_SIZE) { */
-	/* 	m->hives[m->hive_len] = h; */
-	/* 	m->hive_len++; */
-	/* }else { */
-	/* 	printf("ERROR: overflow of hives, could not add latest hive\n"); */
-	/* } */
+	if (m->hive_len < MAX_MAP_SIZE*MAX_MAP_SIZE) {
+		m->hives[m->hive_len] = h;
+		m->hive_len++;
+	}else {
+		printf("ERROR: overflow of hives, could not add latest hive\n");
+	}
 }
 
 
 void add_flower(struct Map *m, struct Flower f) {
 	printf("Adding flower-> row: %3d, col: %3d, p_type: %d\n", f.row, f.col, f.pollen_type);
 	m->map[f.row][f.col] = 'F';
-	/* if (m->flower_len < MAX_MAP_SIZE*MAX_MAP_SIZE) { */
-	/* 	m->flowers[m->flower_len] = f; */
-	/* 	m->flower_len++; */
-	/* }else { */
-	/* 	printf("ERROR: overflow of flowers, could not add latest flower\n"); */
-	/* } */
+	if (m->flower_len < MAX_MAP_SIZE*MAX_MAP_SIZE) {
+		m->flowers[m->flower_len] = f;
+		m->flower_len++;
+	}else {
+		printf("ERROR: overflow of flowers, could not add latest flower\n");
+	}
 }
 
 void add_bee(struct Hive *h, struct Bee b) {
 	printf("Adding bee-> row: %3d, col: %3d, speed: %3d, percep: %3d\n", b.row, b.col, b.speed, b.perception);
-	/* union Pollinator p = { .bee = b }; */
-	/* if (h->pollinator_len < MAX_HIVE_POLLINATORS) { */
-	/* 	h->pollinators[h->pollinator_len] = p; */
-	/* 	h->pollinator_len++; */
-	/* }else { */
-	/* 	printf("ERROR: overflow of pollinators, could not add latest pollinator\n"); */
-	/* } */
+	union Pollinator p = { .bee = b };
+	if (h->pollinator_len < MAX_HIVE_POLLINATORS) {
+		h->pollinators[h->pollinator_len] = p;
+		h->pollinator_len++;
+	}else {
+		printf("ERROR: overflow of pollinators, could not add latest pollinator\n");
+	}
 }
 
 
 void add_wasp(struct Hive *h, struct Wasp w) {
 	printf("Adding wasp-> row: %3d, col: %3d, speed: %3d\n", w.row, w.col, w.speed);
 	union Pollinator p = { .wasp = w };
-	/* if (h->pollinator_len < MAX_HIVE_POLLINATORS) { */
-	/* 	h->pollinators[h->pollinator_len] = p; */
-	/* 	h->pollinator_len++; */
-	/* }else { */
-	/* 	printf("ERROR: overflow of pollinators, could not add latest pollinator\n"); */
-	/* } */
+	if (h->pollinator_len < MAX_HIVE_POLLINATORS) {
+		h->pollinators[h->pollinator_len] = p;
+		h->pollinator_len++;
+	}else {
+		printf("ERROR: overflow of pollinators, could not add latest pollinator\n");
+	}
 }
 
 void add_pollen(struct Flower *f, union Pollen p) {
