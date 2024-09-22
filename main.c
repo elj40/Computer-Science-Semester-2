@@ -49,17 +49,20 @@ int main(int argc, char* argv[]) {
 	enum PollenType pollen_type;
 	enum BeehiveAction beehive_action;
 
-	if (!validate_config_line(config_line, CONFIG_LINE_LEN, &map_size, &duration, &pollen_type, &beehive_action)) {
+	struct Map map;
+	struct Config config;
+
+	if (!validate_config_line(config_line, CONFIG_LINE_LEN, &map.map_size, &config.duration, &config.pollen_type, &config.beehive_action)) {
 		printf("ERROR: Invalid configuration line\n");
 		return 0;
 	}
 
-	printf("pollen type %d\n", pollen_type);
+	printf("pollen type %d\n", config.pollen_type);
 
-	char map[map_size][map_size];
+	/* char map_chars[map_size][map_size]; */
 
-	clear_map(&map[0][0], map_size);
-	read_map(&map[0][0], map_size, pollen_type, beehive_action);
+	/* clear_map(&map[0][0], map_size); */
+	/* read_map(&map[0][0], map_size, pollen_type, beehive_action); */
 
 	/* display_map(&map[0][0], map_size); */
 	return 0;
