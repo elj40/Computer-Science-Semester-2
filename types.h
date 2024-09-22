@@ -65,4 +65,10 @@ struct Map {
 	struct Hive hives[MAX_MAP_SIZE];
 	struct Flower flowers[MAX_MAP_SIZE];
 };
+
+struct Trajectory {
+	int distance;
+	float direction;
+};
+
 #endif
