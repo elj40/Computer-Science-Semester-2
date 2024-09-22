@@ -36,8 +36,10 @@
 
 #include <stdio.h>
 #include "display.h"
+#include "types.h"
 
 void display_map(char *map, int s) {
+
 
 	//Print first line that displays columns
 	printf("   "); //3 empty spaces for top left corner
@@ -79,7 +81,9 @@ void print_horz_row(char *map, int r, int s) {
 	//Output: none
 	printf("%03d", r); 
 	for (int i = 0; i < s; i++) {
-		printf("| %c ", *(map + r*s + i));
+		int index = r*MAX_MAP_SIZE + i;
+		char c = *(map + index);
+		printf("| %c ", c);
 	}
 	printf("|");
 }

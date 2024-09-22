@@ -21,11 +21,6 @@ struct Config {
 	enum BeehiveAction beehive_action;
 };
 
-struct Map {
-	int map_size;
-	char map[MAX_MAP_SIZE][MAX_MAP_SIZE];
-	int hive_len;
-};
 
 struct Bee {
 	int row;
@@ -48,6 +43,7 @@ union Pollinator {
 struct Hive {
 	int row;
 	int col;
+	char type;
 	int pollinator_len;
 	union Pollinator pollinators[MAX_HIVE_POLLINATORS];
 };
@@ -61,4 +57,12 @@ struct Flower {
 };
 
 
+struct Map {
+	int map_size;
+	char map[MAX_MAP_SIZE][MAX_MAP_SIZE];
+	int hive_len;
+	int flower_len;
+	struct Hive hives[MAX_MAP_SIZE*MAX_MAP_SIZE];
+	struct Flower flowers[MAX_MAP_SIZE*MAX_MAP_SIZE];
+};
 #endif
