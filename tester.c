@@ -15,10 +15,12 @@ int main(int argc, char* argv[]) {
 	b = string_to_int(&n, "12345");
 	assert(b && "Boolean not correct");
 	if (b) assert(n == 12345 && "Number not correct");
+	printf(".");
 
 	b = string_to_int(&n, "12f45");
 	assert(!b && "Boolean not correct");
 	if (b) assert(n == 12345 && "Number not correct");
+	printf(".");
 
 	float f;
 	float eps = 0.00001;
@@ -26,22 +28,26 @@ int main(int argc, char* argv[]) {
 	b = string_to_float(&f, "213");
 	assert(b && "string_to_float failed");
 	if (b) assert(f == 213.0 && "Number not correct");
+	printf(".");
 
 	b = string_to_float(&f, "213.12");
 	assert(b && "string_to_float failed");
 	printf("%f\n", f);
 	if (b) assert(f > 213.12 - eps && f < 213.2 + eps && "Number not correct");
+	printf(".");
 
 	b = string_to_float(&f, "0.123456");
 	assert(b && "string_to_float failed");
 	printf("%f\n", f);
 	if (b) assert(f > 0.123456 - eps && f < 0.123456 + eps && "Number not correct");
+	printf(".");
 
 	
 	b = string_to_float(&f, "0.123.456");
 	assert(!b && "string_to_float failed");
 	printf("%f\n", f);
 	if (b) assert(f > 0.123456 - eps && f < 0.123456 + eps && "Number not correct");
+	printf(".");
 	return 0;
 }
 

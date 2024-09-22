@@ -16,7 +16,6 @@ void split_string(char *buffer[], int buf_len, char *string, const char *delims)
 
 bool string_to_int(int *n, char *s) {
 	int i = 0;
-	*n = 0;
 	int x = 0;
 	char c;
 	while (1) {
@@ -32,7 +31,7 @@ bool string_to_int(int *n, char *s) {
 		i++;
 	}
 
-	n* = x;
+	*n = x;
 	return true;
 }
 
@@ -40,7 +39,8 @@ bool string_to_float(float *f, char *s) {
 	int i = 0;
 	int pow_10 = 0;
 	bool decimal_seen = false;
-	*f = 0;
+
+	float x = 0;
 	char c;
 	while (1) {
 		c = *(s+i);	
@@ -60,13 +60,14 @@ bool string_to_float(float *f, char *s) {
 		}
 
 		int digit = c - '0';
-		*f *= 10;
-		*f += digit;
+		x *= 10;
+		x += digit;
 		i++;
 	}
 
 	for (int i = 0; i > pow_10; i--) {
-		*f /= 10;
+		x /= 10;
 	}
+	*f = x;
 	return true;
 }
