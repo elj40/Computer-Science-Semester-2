@@ -13,7 +13,7 @@
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 void test_compass(int row, int col, int speed, int size, int moves);
-int cast_to_int(float n);
+int round_away_from_zero(float n);
 
 int main(int argc, char* argv[]) {
 
@@ -60,22 +60,25 @@ int main(int argc, char* argv[]) {
 	printf("\n");
 	printf("test_compass\n");
 	test_compass(1,1,1,10,8);
+	printf("\n");
+	test_compass(2,1,2,10,8);
 	return 0;
 }
 
 void test_compass(int row, int col, int speed, int size, int moves) {
+	/* Tests finding the next position of an entitiy given a direction and speed */
+	/* Must stay within an n by n grid where n = size */
+	// Here we loop around all the axes
+	// TODO: convert this into an assertable function
 	for (int i = 0; i < moves; i++) {
 		/* float dir = get_next_trajectory(); */
 		float dir = i * M_PI/4;
 		
-		float dc = speed*cos(dir);
-		float dr = speed*sin(dir);
+		float dc = speed*round_away_from_zero(cos(dir));
+		float dr = speed*round_away_from_zero(sin(dir));
 
-		int i_dc = cast_to_int(dc);
-		int i_dr = cast_to_int(dr);
-		
-		int nc = col + i_dc;
-		int nr = row + i_dr;
+		int nc = col + dc;
+		int nr = row + dr;
 
 		nc = MIN(size, MAX(nc, 0));
 		nr = MIN(size, MAX(nr, 0));
@@ -84,7 +87,7 @@ void test_compass(int row, int col, int speed, int size, int moves) {
 	}
 }
 
-int cast_to_int(float n) {
+int round_away_from_zero(float n) {
 	if (n < 0) return (int)-round(-n);
 	return (int)round(n);
 }
