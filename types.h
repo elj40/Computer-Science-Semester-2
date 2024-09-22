@@ -1,7 +1,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-#define MAX_MAP_SIZE 1000
+#define MAX_MAP_SIZE 100
 #define MAX_FLOWER_POLLEN 100
 #define MAX_HIVE_POLLINATORS 200
 #define MAX_POLLEN_LEN 100
@@ -12,7 +12,7 @@ enum BeehiveAction { MAX, MIN, SUM, SORT };
 
 union Pollen {
 	float float_info;
-	char string_info[MAX_POLLEN_LEN];
+	char *string_info;
 };
 
 struct Config {
@@ -24,6 +24,7 @@ struct Config {
 struct Map {
 	int map_size;
 	char map[MAX_MAP_SIZE][MAX_MAP_SIZE];
+	int hive_len;
 };
 
 struct Bee {
@@ -47,13 +48,14 @@ union Pollinator {
 struct Hive {
 	int row;
 	int col;
-	int num_pollinators;
+	int pollinator_len;
 	union Pollinator pollinators[MAX_HIVE_POLLINATORS];
 };
 
 struct Flower {
 	int row;
 	int col;
+	int pollen_len;
 	enum PollenType pollen_type;
 	union Pollen pollen[MAX_FLOWER_POLLEN];
 };
