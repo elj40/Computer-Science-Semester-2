@@ -11,7 +11,7 @@
 #define CONFIG_OPTIONS_LEN 4
 
 void invalid_object_setup(int l) {
-	printf("ERROR: Invalid object setup on line %d", l);
+	printf("ERROR: Invalid object setup on line %d\n", l);
 	exit(0);
 }
 
@@ -52,6 +52,9 @@ bool validate_config_line(char *config_line, int config_len, int *s, struct Conf
 	split_string(config_tokens, config_len, config_line, delimiter);
 
 	if (!string_to_int(s, config_tokens[0])) return false;
+	if (*s <= 0) return false;
+	if (*s > MAX_MAP_SIZE) return false;
+
 	if (!string_to_int(&c->duration, config_tokens[1])) return false;
 
 	if 	(!strcmp("f", config_tokens[2])) c->pollen_type = 0;

@@ -1,6 +1,9 @@
 # vim stuff
 *.swp
 
+# My test folders
+tests*
+
 # Prerequisites
 *.d
 

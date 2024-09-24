@@ -82,10 +82,13 @@ void read_map(struct Map *map, struct Config c) {
 	int current_line = 2;
 	char line[INPUT_LINE_LEN];
 
+
 	while (fgets(line, INPUT_LINE_LEN, stdin) != NULL) {
 
 		char *tokens[INPUT_LINE_LEN];
 		split_string(tokens, INPUT_LINE_LEN, line, " \n");
+
+		if (tokens[4][0] != '\0') invalid_object_setup(current_line);
 
 		char *object_tok = tokens[0];
 		int object_len = strlen(object_tok);
@@ -94,8 +97,8 @@ void read_map(struct Map *map, struct Config c) {
 		char object = object_tok[0];
 
 		int x, y, n; 
-		if (!string_to_int(&x, tokens[1])) invalid_object_setup(current_line);
-		if (!string_to_int(&y, tokens[2])) invalid_object_setup(current_line);
+		if (!string_to_int(&x, tokens[2])) invalid_object_setup(current_line);
+		if (!string_to_int(&y, tokens[1])) invalid_object_setup(current_line);
 		if (!string_to_int(&n, tokens[3])) invalid_object_setup(current_line);
 
 		if (x >= map->map_size) invalid_object_setup(current_line);
@@ -153,11 +156,12 @@ void read_map(struct Map *map, struct Config c) {
 
 			current_line++;
 
-			char *bee_tokens[2];
-			split_string(bee_tokens, 2, bee_line, " \n");
+			char *bee_tokens[3];
+			split_string(bee_tokens, 3, bee_line, " \n");
 
 			if (!string_to_int(&speed, bee_tokens[0])) invalid_object_setup(current_line);
 			if (!string_to_int(&perception, bee_tokens[1])) invalid_object_setup(current_line);
+			if (bee_tokens[2][0] != '\0') invalid_object_setup(current_line);
 
 			for (int i = 0; i < n; i++) {
 				struct Bee bee;
@@ -182,6 +186,9 @@ void read_map(struct Map *map, struct Config c) {
 			split_string(wasp_tokens, 2, wasp_line, " \n");
 
 			if (!string_to_int(&speed, wasp_tokens[0])) invalid_object_setup(current_line);
+
+			if (wasp_tokens[1][0] != '\0') invalid_object_setup(current_line);
+
 
 			for (int i = 0; i < n; i++) {
 				struct Wasp wasp = { .row = hive.row, .col = hive.col, .speed = speed };

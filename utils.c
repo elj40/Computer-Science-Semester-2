@@ -13,6 +13,11 @@ void split_string(char *buffer[], int buf_len, char *string, const char *delims)
 		tc++;
 		tok = strtok(NULL, delims);
 	}
+
+	while (tc < buf_len) {
+		buffer[tc] = "\0";
+		tc++;
+	}
 }
 
 bool string_to_int(int *n, char *s) {
@@ -31,6 +36,8 @@ bool string_to_int(int *n, char *s) {
 		x += digit;
 		i++;
 	}
+
+	if (i == 0) return false;
 
 	*n = x;
 	return true;

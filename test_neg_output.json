@@ -1,0 +1,146 @@
+{
+    "test_1.txt": {
+        "output": "ERROR: Invalid configuration line",
+        "status": "success"
+    },
+    "test_10.txt": {
+        "output": "ERROR: Invalid object setup on line 2",
+        "status": "success"
+    },
+    "test_11.txt": {
+        "output": "ERROR: Invalid object setup on line 2",
+        "status": "success"
+    },
+    "test_12.txt": {
+        "output": "ERROR: Invalid object setup on line 3",
+        "status": "success"
+    },
+    "test_13.txt": {
+        "output": "ERROR: Invalid object setup on line 3",
+        "status": "success"
+    },
+    "test_14.txt": {
+        "output": "Adding pollen-> info_s: hello\nERROR: Invalid object setup on line 4",
+        "status": "success"
+    },
+    "test_15.txt": {
+        "output": "Adding pollen-> info_s: too\nAdding pollen-> info_s: many\nAdding flower-> row:   2, col:   2, p_type: 1\nERROR: Invalid object setup on line 5",
+        "status": "success"
+    },
+    "test_16.txt": {
+        "output": "ERROR: Invalid object setup on line 2",
+        "status": "success"
+    },
+    "test_17.txt": {
+        "output": "ERROR: Invalid object setup on line 2",
+        "status": "success"
+    },
+    "test_18.txt": {
+        "output": "ERROR: Invalid object setup on line 2",
+        "status": "success"
+    },
+    "test_19.txt": {
+        "output": "ERROR: Invalid object setup on line 2",
+        "status": "success"
+    },
+    "test_2.txt": {
+        "output": "ERROR: Invalid configuration line",
+        "status": "success"
+    },
+    "test_20.txt": {
+        "output": "ERROR: Invalid object setup on line 2",
+        "status": "success"
+    },
+    "test_21.txt": {
+        "output": "ERROR: Invalid object setup on line 2",
+        "status": "success"
+    },
+    "test_22.txt": {
+        "output": "ERROR: Invalid object setup on line 2",
+        "status": "success"
+    },
+    "test_23.txt": {
+        "output": "ERROR: Invalid object setup on line 2",
+        "status": "success"
+    },
+    "test_24.txt": {
+        "output": "ERROR: Invalid object setup on line 2",
+        "status": "success"
+    },
+    "test_25.txt": {
+        "output": "ERROR: Invalid object setup on line 2",
+        "status": "success"
+    },
+    "test_26.txt": {
+        "output": "ERROR: Invalid object setup on line 2",
+        "status": "success"
+    },
+    "test_27.txt": {
+        "output": "ERROR: Invalid object setup on line 2",
+        "status": "success"
+    },
+    "test_28.txt": {
+        "output": "ERROR: Invalid object setup on line 2",
+        "status": "success"
+    },
+    "test_29.txt": {
+        "output": "ERROR: Invalid object setup on line 2",
+        "status": "success"
+    },
+    "test_3.txt": {
+        "output": "ERROR: Invalid configuration line",
+        "status": "success"
+    },
+    "test_30.txt": {
+        "output": "ERROR: Invalid object setup on line 2",
+        "status": "success"
+    },
+    "test_31.txt": {
+        "output": "ERROR: Invalid object setup on line 2",
+        "status": "success"
+    },
+    "test_32.txt": {
+        "output": "ERROR: Invalid object setup on line 2",
+        "status": "success"
+    },
+    "test_33.txt": {
+        "output": "ERROR: Invalid object setup on line 3",
+        "status": "success"
+    },
+    "test_34.txt": {
+        "output": "ERROR: Invalid object setup on line 3",
+        "status": "success"
+    },
+    "test_35.txt": {
+        "output": "ERROR: Invalid object setup on line 2",
+        "status": "success"
+    },
+    "test_36.txt": {
+        "output": "ERROR: Invalid object setup on line 3",
+        "status": "success"
+    },
+    "test_4.txt": {
+        "output": "ERROR: Invalid configuration line",
+        "status": "success"
+    },
+    "test_5.txt": {
+        "output": "ERROR: Invalid configuration line",
+        "status": "success"
+    },
+    "test_6.txt": {
+        "output": "ERROR: Invalid configuration line",
+        "status": "success"
+    },
+    "test_7.txt": {
+        "output": "ERROR: Invalid configuration line",
+        "status": "success"
+    },
+    "test_8.txt": {
+        "output": "ERROR: Invalid object setup on line 2",
+        "status": "success"
+    },
+    "test_9.txt": {
+        "output": "ERROR: Invalid object setup on line 2",
+        "status": "success"
+    }
+}
