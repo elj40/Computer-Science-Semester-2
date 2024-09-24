@@ -1,6 +1,6 @@
 #ifndef COMPASS_H
 #define COMPASS_H
 
-float get_next_trajectory();
+struct Trajectory get_next_trajectory(int speed);
 
 #endif

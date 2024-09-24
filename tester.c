@@ -4,10 +4,8 @@
 #include <stdbool.h>
 #include <assert.h>
 
-#include "validate.h"
 #include "utils.h"
 #include "types.h"
-#include "compass.h"
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
@@ -70,20 +68,36 @@ void test_compass(int row, int col, int speed, int size, int moves) {
 	/* Must stay within an n by n grid where n = size */
 	// Here we loop around all the axes
 	// TODO: convert this into an assertable function
-	for (int i = 0; i < moves; i++) {
-		/* float dir = get_next_trajectory(); */
-		float dir = i * M_PI/4;
-		
-		float dc = speed*round_away_from_zero(cos(dir));
-		float dr = speed*round_away_from_zero(sin(dir));
+	//
+	//
+	float epsilon = 0.001;
+	for (int s = 1; s < 4; s++) {
+		printf("\n");
+		for (int i = 0; i < moves; i++) {
+			/* float dir = get_next_trajectory(); */
+			float dir = i * M_PI/4;
 
-		int nc = col + dc;
-		int nr = row + dr;
+			float cos_dir = cos(dir);
+			float sin_dir = sin(dir);
 
-		nc = MIN(size, MAX(nc, 0));
-		nr = MIN(size, MAX(nr, 0));
+			
+			float dc = 0;
+			float dr = 0;
 
-		printf("%d, %d, %f\n", nr, nc, dir / M_PI * 180);
+			if (sin_dir > epsilon) dr = s;
+			else if(sin_dir < -epsilon) dr = -s;
+
+			if (cos_dir > epsilon) dc = s;
+			else if(cos_dir < -epsilon) dc = -s;
+			
+			int nc = col + dc;
+			int nr = row + dr;
+
+			nc = MIN(size, MAX(nc, 0));
+			nr = MIN(size, MAX(nr, 0));
+
+			printf("r:%d, c:%d, dist:%d, dir:%5.1f -> nr:%d, nc:%d\n",row, col, s, dir / M_PI * 180, nr, nc);
+		}
 	}
 }
 
