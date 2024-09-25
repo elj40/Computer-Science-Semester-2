@@ -42,7 +42,7 @@ void display_map(char *map, int s) {
 
 
 	//Print first line that displays columns
-	printf("   "); //3 empty spaces for top left corner
+	printf("    "); //3 empty spaces for top left corner
 	for (int i = 0 ; i < s; i++) {
 		printf("%03d ", i);
 	}

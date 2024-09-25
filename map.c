@@ -52,6 +52,7 @@ void add_bee(struct Hive *h, struct Bee b) {
 	}else {
 		printf("ERROR: overflow of pollinators, could not add latest pollinator\n");
 	}
+	printf("Moving bee-> row: %3d, col: %3d, speed: %3d, percep: %3d\n",p.bee.row,p.bee.col,p.bee.speed,p.bee.perception );
 }
 
 

@@ -3,11 +3,14 @@
 
 #define MAX_MAP_SIZE 100
 #define MAX_FLOWER_POLLEN 100
+#define MAX_BEE_POLLEN 200
 #define MAX_HIVE_POLLINATORS 200
 #define MAX_POLLEN_LEN 100
 
 enum PollenType { FLOAT, STRING };
 enum BeehiveAction { MAX, MIN, SUM, SORT };
+enum BeeRole { FORAGER, SCOUT };
+enum PollinatorState { WANDER, RETURN, SEEK };
 
 
 union Pollen {
@@ -27,6 +30,7 @@ struct Bee {
 	int col;
 	int speed;
 	int perception;
+	enum BeeRole role;	
 };
 
 struct Wasp {

@@ -60,6 +60,8 @@ int main(int argc, char* argv[]) {
 	test_compass(1,1,1,10,8);
 	printf("\n");
 	test_compass(2,1,2,10,8);
+	printf("\n");
+	test_compass(8,8,2,10,8);
 	return 0;
 }
 
@@ -77,12 +79,13 @@ void test_compass(int row, int col, int speed, int size, int moves) {
 			/* float dir = get_next_trajectory(); */
 			float dir = i * M_PI/4;
 
+
+
 			float cos_dir = cos(dir);
 			float sin_dir = sin(dir);
-
 			
-			float dc = 0;
-			float dr = 0;
+			int dc = 0;
+			int dr = 0;
 
 			if (sin_dir > epsilon) dr = s;
 			else if(sin_dir < -epsilon) dr = -s;
@@ -93,8 +96,14 @@ void test_compass(int row, int col, int speed, int size, int moves) {
 			int nc = col + dc;
 			int nr = row + dr;
 
-			nc = MIN(size, MAX(nc, 0));
-			nr = MIN(size, MAX(nr, 0));
+			nc = MIN(size-1, MAX(nc, 0));
+			nr = MIN(size-1, MAX(nr, 0));
+
+
+
+
+
+
 
 			printf("r:%d, c:%d, dist:%d, dir:%5.1f -> nr:%d, nc:%d\n",row, col, s, dir / M_PI * 180, nr, nc);
 		}
