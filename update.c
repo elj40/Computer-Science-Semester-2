@@ -11,7 +11,6 @@
 #define EPS 0.01
 
 void get_next_position_from_trajectory(struct Trajectory t, int n, int r, int c, int *nr, int *nc) {
-
 	float dir = t.direction;
 	int s     = t.distance;
 
@@ -33,6 +32,7 @@ void get_next_position_from_trajectory(struct Trajectory t, int n, int r, int c,
 	*nc = MIN(n, MAX(*nc, 0));
 	*nr = MIN(n, MAX(*nr, 0));
 }
+
 void map_update(struct Map *map, struct Config *config) {
 	for (int i = 0; i < map->hive_len; i++) {
 		hive_update(&map->hives[i], map, config);
@@ -43,6 +43,7 @@ void hive_update(struct Hive *hive, struct Map *map, struct Config *config) {
 	for (int i = 0; i < hive->pollinator_len; i++) {
 		switch (hive->type) {
 			case 'W':
+				wasp_move(&hive->pollinators[i].wasp, map);
 				break;
 			case 'H':
 			case 'B':
@@ -72,11 +73,26 @@ void bee_move(struct Bee *bee, struct Map *map) {
 		map->map[nr][nc] = 'b';
 	}
 
-
 	bee->row = nr;
 	bee->col = nc;
 }
 
-void bee_update(struct Bee *bee, struct Map *map, struct Config *config) {
+void wasp_move(struct Wasp *wasp, struct Map *map) {
+	struct Trajectory t = get_next_trajectory(wasp->speed);
 
+	int nr, nc;
+	get_next_position_from_trajectory(t, map->map_size-1, wasp->row, wasp->col, &nr, &nc);
+
+	printf("Wasp moved from %d,%d to %d,%d\n", wasp->row, wasp->col, nr, nc);
+
+	if (map->map[wasp->row][wasp->col] == 'w') { 
+		map->map[wasp->row][wasp->col] = ' ';
+	}
+
+	if (map->map[nr][nc] == ' ') {
+		map->map[nr][nc] = 'w';
+	}
+
+	wasp->row = nr;
+	wasp->col = nc;
 }
