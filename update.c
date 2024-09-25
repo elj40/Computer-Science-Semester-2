@@ -10,6 +10,29 @@
 
 #define EPS 0.01
 
+void get_next_position_from_trajectory(struct Trajectory t, int n, int r, int c, int *nr, int *nc) {
+
+	float dir = t.direction;
+	int s     = t.distance;
+
+	float cos_dir = cos(dir);
+	float sin_dir = sin(dir);
+
+	int dc = 0;
+	int dr = 0;
+
+	if (sin_dir > EPS) dr = s;
+	else if(sin_dir < -EPS) dr = -s;
+
+	if (cos_dir > EPS) dc = s;
+	else if(cos_dir < -EPS) dc = -s;
+
+	*nc = c + dc;
+	*nr = r + dr;
+
+	*nc = MIN(n, MAX(*nc, 0));
+	*nr = MIN(n, MAX(*nr, 0));
+}
 void map_update(struct Map *map, struct Config *config) {
 	for (int i = 0; i < map->hive_len; i++) {
 		hive_update(&map->hives[i], map, config);
@@ -25,6 +48,7 @@ void hive_update(struct Hive *hive, struct Map *map, struct Config *config) {
 			case 'B':
 			case 'D':
 				bee_move(&hive->pollinators[i].bee, map);
+				/* bee_action(&hive->pollinators[i].bee, map); */
 				break;
 			default:
 				printf("Unknown hive type in update");
@@ -35,31 +59,10 @@ void hive_update(struct Hive *hive, struct Map *map, struct Config *config) {
 void bee_move(struct Bee *bee, struct Map *map) {
 	struct Trajectory t = get_next_trajectory(bee->speed);
 
-	float dir = t.direction;
-	int s = t.distance;
+	int nr, nc;
+	get_next_position_from_trajectory(t, map->map_size-1, bee->row, bee->col, &nr, &nc);
 
-
-	printf("dir=%f dist=%d\n", dir, s);
-
-	float cos_dir = cos(dir);
-	float sin_dir = sin(dir);
-
-	int dc = 0;
-	int dr = 0;
-
-	if (sin_dir > EPS) dr = s;
-	else if(sin_dir < -EPS) dr = -s;
-
-	if (cos_dir > EPS) dc = s;
-	else if(cos_dir < -EPS) dc = -s;
-
-	int nc = bee->col + dc;
-	int nr = bee->row + dr;
-
-	nc = MIN(map->map_size-1, MAX(nc, 0));
-	nr = MIN(map->map_size-1, MAX(nr, 0));
-
-	printf("Bee moved from %d,%d to %d,%d, d: %d,%d\n", bee->row, bee->col, nr, nc, dr, dc);
+	printf("Bee moved from %d,%d to %d,%d\n", bee->row, bee->col, nr, nc);
 
 	if (map->map[bee->row][bee->col] == 'b') { 
 		map->map[bee->row][bee->col] = ' ';
