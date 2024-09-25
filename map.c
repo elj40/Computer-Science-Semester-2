@@ -170,6 +170,7 @@ void read_map(struct Map *map, struct Config c) {
 				bee.col = hive.col;
 				bee.speed = speed;
 				bee.perception = perception;
+				bee.state = WANDER;
 				add_bee(&hive, bee);
 			}
 			add_hive(map, hive);

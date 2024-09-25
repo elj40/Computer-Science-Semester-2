@@ -10,6 +10,15 @@
 
 #define EPS 0.01
 
+/* HAND IN 3: For honey bees, their individual compass also dictates whether it is a scout or a forager. */
+
+/* Each entity moves according to the trajectories given to it by its own compass, with the exception of what the entity may do when encountering another object in the world. See Action Rules. */
+
+/* The range of magnitudes of an entity’s trajectories is determined by its speed parameter which is given as an input at the beginning of the simulation. For each iteration of the simulation, the magnitude of an entity move given by its compass will be a value between 0 (inclusive) and speed (inclusive). */ 
+
+/* If a bee’s magnitude is too large and it flies over a flower or hive, it overshoots them and does not interact with them. The same applied for wasps. */
+
+
 void get_next_position_from_trajectory(struct Trajectory t, int n, int r, int c, int *nr, int *nc) {
 	float dir = t.direction;
 	int s     = t.distance;
@@ -57,8 +66,18 @@ void hive_update(struct Hive *hive, struct Map *map, struct Config *config) {
 		}
 	}
 }
+/* All types of bees have a perception range at which they can “see” flowers. If any bee except the scout bee sees a flower within its perception range that contains pollen, it will move in a direction towards the flower on the next turn(s) (as long as it is not carrying an item), with the magnitude given by the trajectory. In contrast, if a scout bee sees a flower within its perception range that contains pollen, it will immediately fly back to its hive to inform the foragers. If there are multiple flowers in the range of the bee, the bee will always go towards the flower that is closest (i.e. within less perception range), and is the bottom-most and left-most within that proximity. */ 
+
+/* When entities know the location of their destination and can fly towards the destination, they first move diagonally in the direction of the destination until they can move in a straight line towards the destination. The distance they move is always determined by their compass. */
+
+struct Trajectory bee_get_next_trajectory(struct Bee *bee) {
+	if (bee->state == WANDER) {
+		return get_random_trajectory(bee->speed);
+	}
+	return get_random_trajectory(bee->speed);
+}
 void bee_move(struct Bee *bee, struct Map *map) {
-	struct Trajectory t = get_next_trajectory(bee->speed);
+	struct Trajectory t = bee_get_next_trajectory(bee);
 
 	int nr, nc;
 	get_next_position_from_trajectory(t, map->map_size-1, bee->row, bee->col, &nr, &nc);
@@ -78,7 +97,7 @@ void bee_move(struct Bee *bee, struct Map *map) {
 }
 
 void wasp_move(struct Wasp *wasp, struct Map *map) {
-	struct Trajectory t = get_next_trajectory(wasp->speed);
+	struct Trajectory t = get_random_trajectory(wasp->speed);
 
 	int nr, nc;
 	get_next_position_from_trajectory(t, map->map_size-1, wasp->row, wasp->col, &nr, &nc);

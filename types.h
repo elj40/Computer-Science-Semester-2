@@ -10,6 +10,7 @@
 enum PollenType { FLOAT, STRING };
 enum BeehiveAction { MAX, MIN, SUM, SORT };
 enum BeeRole { FORAGER, SCOUT };
+enum BeeType { NORMAL, HONEY, DESERT };
 enum PollinatorState { WANDER, RETURN, SEEK };
 
 
@@ -23,6 +24,9 @@ struct Config {
 	enum PollenType pollen_type;
 	enum BeehiveAction beehive_action;
 };
+/* All types of bees have a perception range at which they can “see” flowers. If any bee except the scout bee sees a flower within its perception range that contains pollen, it will move in a direction towards the flower on the next turn(s) (as long as it is not carrying an item), with the magnitude given by the trajectory. In contrast, if a scout bee sees a flower within its perception range that contains pollen, it will immediately fly back to its hive to inform the foragers. If there are multiple flowers in the range of the bee, the bee will always go towards the flower that is closest (i.e. within less perception range), and is the bottom-most and left-most within that proximity. */ 
+
+/* When entities know the location of their destination and can fly towards the destination, they first move diagonally in the direction of the destination until they can move in a straight line towards the destination. The distance they move is always determined by their compass. */
 
 
 struct Bee {
@@ -31,6 +35,8 @@ struct Bee {
 	int speed;
 	int perception;
 	enum BeeRole role;	
+	enum PollinatorState state;
+	enum BeeType type;
 };
 
 struct Wasp {
