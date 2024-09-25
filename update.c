@@ -70,10 +70,44 @@ void hive_update(struct Hive *hive, struct Map *map, struct Config *config) {
 
 /* When entities know the location of their destination and can fly towards the destination, they first move diagonally in the direction of the destination until they can move in a straight line towards the destination. The distance they move is always determined by their compass. */
 
+// TODO: do the random distribution with speed thingy
+struct Trajectory get_trajectory_from_target(int r, int c, int tr, int tc, int speed) {
+	if (tr == r && tc >  c) return { .direction: 0 * M_PI/4, .distance: speed};
+	if (tr >  r && tc >  c) return { .direction: 1 * M_PI/4, .distance: speed};
+	if (tr >  r && tc == c) return { .direction: 2 * M_PI/4, .distance: speed};
+	if (tr >  r && tc <  c) return { .direction: 3 * M_PI/4, .distance: speed};
+	if (tr == r && tc <  c) return { .direction: 4 * M_PI/4, .distance: speed};
+	if (tr <  r && tc <  c) return { .direction: 5 * M_PI/4, .distance: speed};
+	if (tr <  r && tc == c) return { .direction: 6 * M_PI/4, .distance: speed};
+	if (tr <  r && tc >  c) return { .direction: 7 * M_PI/4, .distance: speed};
+	printf("No idea where the target is, if not on same spot");
+	return { .direction: 7 * M_PI/4, .distance: 0 };
+}
+
 struct Trajectory bee_get_next_trajectory(struct Bee *bee) {
-	if (bee->state == WANDER) {
+	int flower_r, flower_c;
+	bee_check_for_flowers(bee->row, bee->col, bee->perception, &flower_r, &flower_c);
+
+	if (bee->state == WANDER) 
+	{
+		if (flower_r != -1) 
+		{
+			bee->state = SEEK;
+			return get_trajectory_from_target(bee->row, bee->col, flower_r, flower_c);
+		}
+			
 		return get_random_trajectory(bee->speed);
 	}
+	else if (bee->state == RETURN) 
+	{
+		return { .direction = 3 * M_PI/4, .distance = bee->speed };
+	}
+	else if (bee->state == SEEK)
+	{
+		return get_trajectory_from_target(bee->row, bee->col, flower_r, flower_c);
+	}
+	
+	printf("Somehow bee does not have correct state, returning random direction\n");
 	return get_random_trajectory(bee->speed);
 }
 void bee_move(struct Bee *bee, struct Map *map) {
