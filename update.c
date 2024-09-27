@@ -71,17 +71,19 @@ void hive_update(struct Hive *hive, struct Map *map, struct Config *config) {
 /* When entities know the location of their destination and can fly towards the destination, they first move diagonally in the direction of the destination until they can move in a straight line towards the destination. The distance they move is always determined by their compass. */
 
 // TODO: do the random distribution with speed thingy
-struct Trajectory get_trajectory_from_target(int r, int c, int tr, int tc, int speed) {
-	if (tr == r && tc >  c) return { .direction: 0 * M_PI/4, .distance: speed};
-	if (tr >  r && tc >  c) return { .direction: 1 * M_PI/4, .distance: speed};
-	if (tr >  r && tc == c) return { .direction: 2 * M_PI/4, .distance: speed};
-	if (tr >  r && tc <  c) return { .direction: 3 * M_PI/4, .distance: speed};
-	if (tr == r && tc <  c) return { .direction: 4 * M_PI/4, .distance: speed};
-	if (tr <  r && tc <  c) return { .direction: 5 * M_PI/4, .distance: speed};
-	if (tr <  r && tc == c) return { .direction: 6 * M_PI/4, .distance: speed};
-	if (tr <  r && tc >  c) return { .direction: 7 * M_PI/4, .distance: speed};
+struct Trajectory get_trajectory_from_target(int r, int c,int speed, int tr, int tc, ) {
+	struct Trajectory t = { .distance = speed };
+	if (tr == r && tc >  c) t.direction= 0 * M_PI/4;
+	else if (tr >  r && tc >  c) t.direction= 1 * M_PI/4;
+	else if (tr >  r && tc == c) t.direction= 2 * M_PI/4;
+	else if (tr >  r && tc <  c) t.direction= 3 * M_PI/4;
+	else if (tr == r && tc <  c) t.direction= 4 * M_PI/4;
+	else if (tr <  r && tc <  c) t.direction= 5 * M_PI/4;
+	else if (tr <  r && tc == c) t.direction= 6 * M_PI/4;
+	else if (tr <  r && tc >  c) t.direction= 7 * M_PI/4;
 	printf("No idea where the target is, if not on same spot");
-	return { .direction: 7 * M_PI/4, .distance: 0 };
+	t.distance = 0;
+	return t;
 }
 
 struct Trajectory bee_get_next_trajectory(struct Bee *bee) {
@@ -93,18 +95,18 @@ struct Trajectory bee_get_next_trajectory(struct Bee *bee) {
 		if (flower_r != -1) 
 		{
 			bee->state = SEEK;
-			return get_trajectory_from_target(bee->row, bee->col, flower_r, flower_c);
+			return get_trajectory_from_target(bee->row, bee->col, bee->speed, flower_r, flower_c);
 		}
 			
 		return get_random_trajectory(bee->speed);
 	}
 	else if (bee->state == RETURN) 
 	{
-		return { .direction = 3 * M_PI/4, .distance = bee->speed };
+		return get_random_trajectory(bee->speed);
 	}
 	else if (bee->state == SEEK)
 	{
-		return get_trajectory_from_target(bee->row, bee->col, flower_r, flower_c);
+		return get_trajectory_from_target(bee->row, bee->col, bee->speed,flower_r, flower_c);
 	}
 	
 	printf("Somehow bee does not have correct state, returning random direction\n");
