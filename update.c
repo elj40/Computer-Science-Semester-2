@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 
 #include "types.h"
@@ -71,7 +72,7 @@ void hive_update(struct Hive *hive, struct Map *map, struct Config *config) {
 /* When entities know the location of their destination and can fly towards the destination, they first move diagonally in the direction of the destination until they can move in a straight line towards the destination. The distance they move is always determined by their compass. */
 
 // TODO: do the random distribution with speed thingy
-struct Trajectory get_trajectory_from_target(int r, int c,int speed, int tr, int tc, ) {
+struct Trajectory get_trajectory_from_target(int r, int c,int speed, int tr, int tc) {
 	struct Trajectory t = { .distance = speed };
 	if (tr == r && tc >  c) t.direction= 0 * M_PI/4;
 	else if (tr >  r && tc >  c) t.direction= 1 * M_PI/4;
@@ -85,10 +86,50 @@ struct Trajectory get_trajectory_from_target(int r, int c,int speed, int tr, int
 	t.distance = 0;
 	return t;
 }
+void bee_check_for_flowers(struct Bee *bee, struct Map *m, int *fr, int *fc) {
+	/* If therr are any flowers, return most bottom left one
+	 * Find bottom-left and top-right corner
+	 * 	Must be within bounds if map
+	 * Loop from bottom-left to top right
+	 *
+	 * if flower:
+	 * 	if closest to bee:
+	 * 	    save postion
+	 *
+	 * return closest flower
+	 *
+	 * Should work because of the way we loop through (going from bottom to top)
+	 */
 
-struct Trajectory bee_get_next_trajectory(struct Bee *bee) {
+	int r = bee->row;
+	int c = bee->col;
+	int p = bee->perception;
+
+	int top = MIN(m->map_size-1, r + p);
+	int bottom = MIN(0, r - p);
+	int right = MIN(m->map_size-1, c + p);
+	int left = MIN(0, c - p);
+
+	int min_dist = m->map_size + 1;
+
+	*fr = -1;
+	*fc = -1;
+
+	for (int y = bottom; y <= top; y++) {
+		for (int x = left; x <= right; x++) {
+			if (m->map[y][x] == 'F') {
+				int dist = MAX(abs(y-r),abs(c-x));
+				if (dist < min_dist) {
+					*fr = y;
+					*fc = x;
+				}
+			}
+		}
+	}
+}
+struct Trajectory bee_get_next_trajectory(struct Bee *bee, struct Map *map) {
 	int flower_r, flower_c;
-	bee_check_for_flowers(bee->row, bee->col, bee->perception, &flower_r, &flower_c);
+	bee_check_for_flowers(bee, map, &flower_r, &flower_c);
 
 	if (bee->state == WANDER) 
 	{
@@ -113,7 +154,7 @@ struct Trajectory bee_get_next_trajectory(struct Bee *bee) {
 	return get_random_trajectory(bee->speed);
 }
 void bee_move(struct Bee *bee, struct Map *map) {
-	struct Trajectory t = bee_get_next_trajectory(bee);
+	struct Trajectory t = bee_get_next_trajectory(bee, map);
 
 	int nr, nc;
 	get_next_position_from_trajectory(t, map->map_size-1, bee->row, bee->col, &nr, &nc);
