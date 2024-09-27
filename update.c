@@ -82,8 +82,9 @@ struct Trajectory get_trajectory_from_target(int r, int c,int speed, int tr, int
 	else if (tr <  r && tc <  c) t.direction= 5 * M_PI/4;
 	else if (tr <  r && tc == c) t.direction= 6 * M_PI/4;
 	else if (tr <  r && tc >  c) t.direction= 7 * M_PI/4;
-	printf("No idea where the target is, if not on same spot");
+	else { printf("No idea where the target is, if not on same spot");
 	t.distance = 0;
+	}
 	return t;
 }
 void bee_check_for_flowers(struct Bee *bee, struct Map *m, int *fr, int *fc) {
@@ -106,9 +107,9 @@ void bee_check_for_flowers(struct Bee *bee, struct Map *m, int *fr, int *fc) {
 	int p = bee->perception;
 
 	int top = MIN(m->map_size-1, r + p);
-	int bottom = MIN(0, r - p);
+	int bottom = MAX(0, r - p);
 	int right = MIN(m->map_size-1, c + p);
-	int left = MIN(0, c - p);
+	int left = MAX(0, c - p);
 
 	int min_dist = m->map_size + 1;
 

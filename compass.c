@@ -14,8 +14,8 @@
 struct Trajectory get_random_trajectory(int speed) {
 	struct Trajectory t;
 
-	t.distance = rand() % (speed+1);
-	/* t.distance = speed; */
+	// t.distance = rand() % (speed+1);
+	t.distance = speed;
 	t.direction = (rand() % 9) * M_PI/4;
 	return t;
 }
