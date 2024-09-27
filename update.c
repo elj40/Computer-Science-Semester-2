@@ -20,7 +20,7 @@
 /* If a bee’s magnitude is too large and it flies over a flower or hive, it overshoots them and does not interact with them. The same applied for wasps. */
 
 
-void get_next_position_from_trajectory(struct Trajectory t, int n, int r, int c, int *nr, int *nc) {
+void get_next_position_from_trajectory(Trajectory t, int n, int r, int c, int *nr, int *nc) {
 	float dir = t.direction;
 	int s     = t.distance;
 
@@ -43,13 +43,13 @@ void get_next_position_from_trajectory(struct Trajectory t, int n, int r, int c,
 	*nr = MIN(n, MAX(*nr, 0));
 }
 
-void map_update(struct Map *map, struct Config *config) {
+void map_update( Map *map, Config *config) {
 	for (int i = 0; i < map->hive_len; i++) {
 		hive_update(&map->hives[i], map, config);
 	}
 }
 
-void hive_update(struct Hive *hive, struct Map *map, struct Config *config) {
+void hive_update( Hive *hive,  Map *map, Config *config) {
 	for (int i = 0; i < hive->pollinator_len; i++) {
 		switch (hive->type) {
 			case 'W':
@@ -72,8 +72,8 @@ void hive_update(struct Hive *hive, struct Map *map, struct Config *config) {
 /* When entities know the location of their destination and can fly towards the destination, they first move diagonally in the direction of the destination until they can move in a straight line towards the destination. The distance they move is always determined by their compass. */
 
 // TODO: do the random distribution with speed thingy
-struct Trajectory get_trajectory_from_target(int r, int c,int speed, int tr, int tc) {
-	struct Trajectory t = { .distance = speed };
+ Trajectory get_trajectory_from_target(int r, int c,int speed, int tr, int tc) {
+	 Trajectory t = { .distance = speed };
 	if (tr == r && tc >  c) t.direction= 0 * M_PI/4;
 	else if (tr >  r && tc >  c) t.direction= 1 * M_PI/4;
 	else if (tr >  r && tc == c) t.direction= 2 * M_PI/4;
@@ -82,12 +82,17 @@ struct Trajectory get_trajectory_from_target(int r, int c,int speed, int tr, int
 	else if (tr <  r && tc <  c) t.direction= 5 * M_PI/4;
 	else if (tr <  r && tc == c) t.direction= 6 * M_PI/4;
 	else if (tr <  r && tc >  c) t.direction= 7 * M_PI/4;
-	else { printf("No idea where the target is, if not on same spot");
-	t.distance = 0;
+	else if (tr == r && tc == c) {
+		t.distance = 0;
+		printf("Already at target\n");
+	}
+	else { 
+		printf("No idea where the target is\n");
+		t.distance = 0;
 	}
 	return t;
 }
-void bee_check_for_flowers(struct Bee *bee, struct Map *m, int *fr, int *fc) {
+void bee_check_for_flowers( Bee *bee,  Map *m, int *fr, int *fc) {
 	/* If therr are any flowers, return most bottom left one
 	 * Find bottom-left and top-right corner
 	 * 	Must be within bounds if map
@@ -128,7 +133,8 @@ void bee_check_for_flowers(struct Bee *bee, struct Map *m, int *fr, int *fc) {
 		}
 	}
 }
-struct Trajectory bee_get_next_trajectory(struct Bee *bee, struct Map *map) {
+
+ Trajectory bee_get_next_trajectory( Bee *bee,  Map *map) {
 	int flower_r, flower_c;
 	bee_check_for_flowers(bee, map, &flower_r, &flower_c);
 
@@ -154,8 +160,8 @@ struct Trajectory bee_get_next_trajectory(struct Bee *bee, struct Map *map) {
 	printf("Somehow bee does not have correct state, returning random direction\n");
 	return get_random_trajectory(bee->speed);
 }
-void bee_move(struct Bee *bee, struct Map *map) {
-	struct Trajectory t = bee_get_next_trajectory(bee, map);
+void bee_move( Bee *bee,  Map *map) {
+	 Trajectory t = bee_get_next_trajectory(bee, map);
 
 	int nr, nc;
 	get_next_position_from_trajectory(t, map->map_size-1, bee->row, bee->col, &nr, &nc);
@@ -174,8 +180,9 @@ void bee_move(struct Bee *bee, struct Map *map) {
 	bee->col = nc;
 }
 
-void wasp_move(struct Wasp *wasp, struct Map *map) {
-	struct Trajectory t = get_random_trajectory(wasp->speed);
+
+void wasp_move( Wasp *wasp,  Map *map) {
+	Trajectory t = get_random_trajectory(wasp->speed);
 
 	int nr, nc;
 	get_next_position_from_trajectory(t, map->map_size-1, wasp->row, wasp->col, &nr, &nc);

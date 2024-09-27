@@ -8,6 +8,6 @@
 
 void invalid_object_setup(int l);
 bool validate_gui_mode(int argc,char* argv[], int *gm);
-bool validate_config_line(char *config_line, int config_len, int *s, struct Config *c);
+bool validate_config_line(char *config_line, int config_len, int *s, Config *c);
 
 #endif

@@ -26,8 +26,8 @@ int main(int argc, char* argv[]) {
 	enum PollenType pollen_type;
 	enum BeehiveAction beehive_action;
 
-	struct Map map;
-	struct Config config;
+	 Map map;
+	Config config;
 
 
 	if (!validate_config_line(config_line, CONFIG_LINE_LEN, &map.map_size, &config)) {

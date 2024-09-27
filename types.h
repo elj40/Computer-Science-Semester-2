@@ -19,17 +19,17 @@ union Pollen {
 	char *string_info;
 };
 
-struct Config {
+typedef struct {
 	int duration;
 	enum PollenType pollen_type;
 	enum BeehiveAction beehive_action;
-};
+} Config;
 /* All types of bees have a perception range at which they can “see” flowers. If any bee except the scout bee sees a flower within its perception range that contains pollen, it will move in a direction towards the flower on the next turn(s) (as long as it is not carrying an item), with the magnitude given by the trajectory. In contrast, if a scout bee sees a flower within its perception range that contains pollen, it will immediately fly back to its hive to inform the foragers. If there are multiple flowers in the range of the bee, the bee will always go towards the flower that is closest (i.e. within less perception range), and is the bottom-most and left-most within that proximity. */ 
 
 /* When entities know the location of their destination and can fly towards the destination, they first move diagonally in the direction of the destination until they can move in a straight line towards the destination. The distance they move is always determined by their compass. */
 
 
-struct Bee {
+typedef struct {
 	int row;
 	int col;
 	int speed;
@@ -37,48 +37,44 @@ struct Bee {
 	enum BeeRole role;	
 	enum PollinatorState state;
 	enum BeeType type;
-};
+} Bee;
 
-struct Wasp {
+typedef struct {
 	int row;
 	int col;
 	int speed;
-};
+} Wasp;
 
 union Pollinator {
-	struct Bee bee;
-	struct Wasp wasp;
+	Bee bee;
+	Wasp wasp;
 };
-
-struct Hive {
+typedef struct {
 	int row;
 	int col;
 	char type;
 	int pollinator_len;
 	union Pollinator pollinators[MAX_HIVE_POLLINATORS];
-};
-
-struct Flower {
+} Hive;
+typedef struct {
 	int row;
 	int col;
 	int pollen_len;
 	enum PollenType pollen_type;
 	union Pollen pollen[MAX_FLOWER_POLLEN];
-};
+} Flower;
 
-
-struct Map {
+typedef struct {
 	int map_size;
 	char map[MAX_MAP_SIZE][MAX_MAP_SIZE];
 	int hive_len;
 	int flower_len;
-	struct Hive hives[MAX_MAP_SIZE];
-	struct Flower flowers[MAX_MAP_SIZE];
-};
-
-struct Trajectory {
+	Hive hives[MAX_MAP_SIZE];
+	Flower flowers[MAX_MAP_SIZE];
+} Map;
+typedef struct {
 	int distance;
 	float direction;
-};
+} Trajectory;
 
 #endif

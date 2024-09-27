@@ -3,8 +3,8 @@
 
 #include "types.h"
 
-void clear_map(struct Map *map);
-void read_map(struct Map *map, struct Config c);
-void add_pollen(struct Flower *f, union Pollen p);
+void clear_map( Map *map);
+void read_map( Map *map, Config c);
+void add_pollen( Flower *f, union Pollen p);
 
 #endif
