@@ -2,7 +2,23 @@
 #include <stdbool.h>
 
 #include "utils.h"
+#include "types.h"
 
+void bee_append_to_linked_list(Bee *head, Bee *bee) {
+	Bee *current_bee = head;
+	while (current_bee != NULL) {
+		current_bee = current_bee->next_ptr;
+	}
+	current_bee->next_ptr = bee;
+}
+
+/* void wasp_append_to_linked_list(Wasp *head, Wasp *wasp) { */
+/* 	Wasp *current_wasp = head; */
+/* 	while (current_wasp->next_ptr) { */
+/* 		current_wasp = current_wasp->next_ptr; */
+/* 	} */
+/* 	current_wasp->next_ptr = wasp; */
+/* } */
 
 void split_string(char *buffer[], int buf_len, char *string, const char *delims) {
 	char* tok = strtok(string, delims);

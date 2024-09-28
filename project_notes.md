@@ -86,14 +86,12 @@
     - Whenever an object moves into the cell it gets appended to the tail (do we need tail?)
     - Whenever an object moves out of the cell, remove it from the linked list
     - The above should probably be a linked list for each type of entity (wasp, each type of bee)
-    
+
 - This means every bee should havea pointer to a next bee and a previous bee
 - This will also make deleting bees very easy, as we can just remove them and not put them anywhere else
 - Can also set static pointer to null to forget flowers
 - Displaying: 
     - can have a display char that remains constant if it represents a static (e.g. will always show `F` even if flower is forgotten 
-
-
 
 ## Pseudocode
 
