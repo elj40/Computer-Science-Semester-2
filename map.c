@@ -24,6 +24,7 @@ void clear_map(Map *map) {
 	int s = map->map_size;
 	for (int i = 0 ; i < s; i++) {
 		for (int j = 0 ; j < s; j++) {
+			
 			Cell c = {
 				.display_char = ' ',
 				.bee_head_ptr = NULL,
@@ -31,13 +32,50 @@ void clear_map(Map *map) {
 				.flower_ptr = NULL,
 				.hive_ptr = NULL
 			};
+			
 			map->map[i][j] = c;
 		}
 	}
 }
 
+
+void bee_free_linked_list(BeeNode *head) {
+	BeeNode * current = head;
+
+	while (current != NULL) {
+		BeeNode *next_bee_ptr = current->next_ptr;
+		free(current);
+		current = next_bee_ptr;
+	}	
+}
+
+/* void wasp_free_linked_list(WaspNode *head) { */
+/* 	WaspNode *current = head; */
+/* 	WaspNode *next_bee_ptr; */
+
+/* 	while (current != NULL) { */
+/* 		*next_bee_ptr = current->next_ptr; */
+/* 		free(current); */
+/* 		current = next_bee_ptr; */
+/* 	} */	
+/* } */
+
+void free_map(Map *map) {
+	int ms = map->map_size;
+
+	for (int i = 0; i < ms; i++) {
+		for (int j = 0; j < ms; j++) {
+			Cell c = map->map[i][j];
+			bee_free_linked_list(c.bee_head_ptr);
+			/* wasp_free_linked_list(c.wasp_head_ptr); */
+		}
+
+	}
+}
+
+
 void add_hive(Map *m,  Hive h) {
-	printf("Adding hive-> row: %3d, col: %3d\n", h.row, h.col);
+	printf("Adding hive-> row: %3d, col: %3d, type:%c\n", h.row, h.col, h.type);
 	Cell *c = &m->map[h.row][h.col];
 
 	if (c->display_char != ' ') {
@@ -62,12 +100,29 @@ void add_flower(Map *m,  Flower f) {
 	c->display_char = 'F';
 	c->flower_ptr = &f;
 }
+void bee_append_to_linked_list(BeeNode **head, Bee bee) {
+	BeeNode *new_node = (BeeNode *) malloc(sizeof(BeeNode));
+	new_node->bee = bee;
+	new_node->next_ptr = NULL;
+
+	if (*head == NULL) {
+		*head = new_node;
+		return;
+	}
+
+	BeeNode *current_bee_node = *head;
+	while (current_bee_node->next_ptr != NULL) {
+		current_bee_node = current_bee_node->next_ptr;
+	}
+	current_bee_node->next_ptr = new_node;
+}
 
 void add_bee(Map *m, Bee b) {
 	printf("Adding bee-> row: %3d, col: %3d, speed: %3d, percep: %3d\n", b.row, b.col, b.speed, b.perception);
 	Cell *c = &m->map[b.row][b.col];
+	c->bee_head_ptr = NULL;
 
-	bee_append_to_linked_list(c->bee_head_ptr, &b);
+	bee_append_to_linked_list(&c->bee_head_ptr, b);
 }
 
 

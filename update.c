@@ -44,11 +44,11 @@
 /* 	*nr = MIN(n, MAX(*nr, 0)); */
 /* } */
 
-/* void map_update( Map *map, Config *config) { */
+void map_update( Map *map, Config *config) {
 /* 	for (int i = 0; i < map->hive_len; i++) { */
 /* 		hive_update(&map->hives[i], map, config); */
 /* 	} */
-/* } */
+}
 
 /* void hive_update( Hive *hive,  Map *map, Config *config) { */
 /* 	for (int i = 0; i < hive->pollinator_len; i++) { */

@@ -34,7 +34,6 @@ typedef struct {
 	char type;
 } Hive;
 
-
 typedef struct Bee {
 	int row;
 	int col;
@@ -47,6 +46,11 @@ typedef struct Bee {
 	enum PollinatorState state;
 	enum BeeType type;
 } Bee;
+
+typedef struct BeeNode {
+	Bee bee;
+	struct BeeNode *next_ptr;
+} BeeNode;
 
 typedef struct {
 	int row;

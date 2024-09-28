@@ -40,13 +40,13 @@ int main(int argc, char* argv[]) {
 	read_map(&map, config);
 	printf("Finished reading map....\n");
 	display_map(&map);
-	/* printf("\n\n"); */
+	printf("\n\n");
 
-	/* for (int iter = 0; iter < config.duration; iter++) { */
-	/* 	map_update(&map, &config); */
-	/* 	display_map((char *)map.map, map.map_size); */
-	/* } */
-
+	for (int iter = 0; iter < config.duration; iter++) {
+		map_update(&map, &config);
+		display_map(&map);
+	}
+	free_map(&map);
 
 	return 0;
 }

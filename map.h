@@ -7,7 +7,7 @@ typedef struct {
 	char display_char;	
 	Flower *flower_ptr;
 	Hive *hive_ptr;
-	Bee *bee_head_ptr;
+	BeeNode *bee_head_ptr;
 	Wasp *wasp_head_ptr;
 } Cell;
 
@@ -17,6 +17,7 @@ typedef struct {
 } Map;
 
 void clear_map( Map *map);
+void free_map(Map *map);
 void read_map( Map *map, Config c);
 void add_pollen( Flower *f, union Pollen p);
 
