@@ -109,7 +109,7 @@ void get_pollinators_at_position(int r, int c,  Map *map, union Pollinator *poll
 		}
 	}
 }
-void read_map( Map *map, Config c) {
+void read_map(Map *map, Config c) {
 	int current_line = 2;
 	char line[INPUT_LINE_LEN];
 
@@ -149,7 +149,12 @@ void read_map( Map *map, Config c) {
 		int perception;
 		if (object == 'F') {
 			// Do some weird semicolons because of the switch case
-			 Flower flower = { .row = y, .col = x, .pollen_len = 0, .pollen_type = c.pollen_type };
+			Flower flower = { 
+				.row = y, 
+				.col = x, 
+				.pollen_len = 0,
+				.pollen_type = c.pollen_type
+			};
 
 			for (int i = 0; i < n; i++) {
 				current_line++;
@@ -178,7 +183,12 @@ void read_map( Map *map, Config c) {
 			add_flower(map, flower);
 		}
 		else if (object == 'B' || object == 'H' || object == 'D') {
-			 Hive hive = { .row = y, .col = x, .type=object, .pollinator_len = 0};
+			Hive hive = { 
+				.row = y,
+				.col = x, 
+				.type=object, 
+				.pollinator_len = 0
+			};
 
 			char bee_line[BEE_MAX_CHARS];
 			if (fgets(bee_line, BEE_MAX_CHARS, stdin) == NULL) {
@@ -195,12 +205,14 @@ void read_map( Map *map, Config c) {
 			if (bee_tokens[2][0] != '\0') invalid_object_setup(current_line);
 
 			for (int i = 0; i < n; i++) {
-				 Bee bee;
-				bee.row = hive.row;
-				bee.col = hive.col;
-				bee.speed = speed;
-				bee.perception = perception;
-				bee.state = WANDER;
+				Bee bee = {
+					.row = hive.row,
+					.col = hive.col,
+					.speed = speed,
+					.perception = perception,
+					.state = WANDER,
+					.hive_ptr = &hive
+				};
 				add_bee(&hive, bee);
 			}
 			add_hive(map, hive);
@@ -223,15 +235,18 @@ void read_map( Map *map, Config c) {
 
 
 			for (int i = 0; i < n; i++) {
-				 Wasp wasp = { .row = hive.row, .col = hive.col, .speed = speed };
+			 	Wasp wasp = { 
+					.row = hive.row, 
+					.col = hive.col, 
+					.speed = speed,
+					.hive_ptr = &hive
+				};
 				add_wasp(&hive, wasp);
 			}
 			add_hive(map, hive);
 		}
-		else {
-			invalid_object_setup(current_line);
-		}
-
+		else invalid_object_setup(current_line);
+		
 		current_line++;
 	}
 
