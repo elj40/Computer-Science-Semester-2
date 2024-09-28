@@ -37,8 +37,21 @@
 #include <stdio.h>
 #include "display.h"
 #include "types.h"
+#include "map.h"
 
-void display_map(char *map, int s) {
+void display_map(Map *map) {
+	char char_map[map->map_size][map->map_size];
+	
+	for (int i = 0 ; i < map->map_size; i++) {
+		for (int j = 0 ; j < map->map_size; j++) {
+			char_map[i][j] = map->map[i][j].display_char;
+		}
+	}
+
+	display_char_map(&char_map[0][0], map->map_size);
+}
+
+void display_char_map(char *map, int s) {
 
 
 	//Print first line that displays columns

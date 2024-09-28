@@ -28,12 +28,21 @@ typedef struct {
 
 /* When entities know the location of their destination and can fly towards the destination, they first move diagonally in the direction of the destination until they can move in a straight line towards the destination. The distance they move is always determined by their compass. */
 
-
 typedef struct {
+	int row;
+	int col;
+	char type;
+} Hive;
+
+
+typedef struct Bee {
 	int row;
 	int col;
 	int speed;
 	int perception;
+	Hive *hive_ptr;
+	struct Bee *previous_ptr;
+	struct Bee *next_ptr;
 	enum BeeRole role;	
 	enum PollinatorState state;
 	enum BeeType type;
@@ -43,6 +52,7 @@ typedef struct {
 	int row;
 	int col;
 	int speed;
+	Hive *hive_ptr;
 } Wasp;
 
 union Pollinator {
@@ -52,26 +62,11 @@ union Pollinator {
 typedef struct {
 	int row;
 	int col;
-	char type;
-	int pollinator_len;
-	union Pollinator pollinators[MAX_HIVE_POLLINATORS];
-} Hive;
-typedef struct {
-	int row;
-	int col;
 	int pollen_len;
 	enum PollenType pollen_type;
 	union Pollen pollen[MAX_FLOWER_POLLEN];
 } Flower;
 
-typedef struct {
-	int map_size;
-	char map[MAX_MAP_SIZE][MAX_MAP_SIZE];
-	int hive_len;
-	int flower_len;
-	Hive hives[MAX_MAP_SIZE];
-	Flower flowers[MAX_MAP_SIZE];
-} Map;
 typedef struct {
 	int distance;
 	float direction;

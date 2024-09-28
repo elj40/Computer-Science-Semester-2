@@ -76,6 +76,13 @@
 - Must be able to have each agent act independently
     - OOP
 
+## Map idea
+- 2d array of cells (linked list)
+    - Each cell has pointer to static (beehive, wasp hive or flower)
+    - Each cell has pointer to head and tail of linked list for each type of entity
+    - Whenever an object moves into the cell it gets appended to the tail (do we need tail?)
+    - Whenever an object moves out of the cell, remove it from the linked list
+    - The above should probably be a linked list for each type of entity (wasp, each type of bee)
 
 ## Pseudocode
 

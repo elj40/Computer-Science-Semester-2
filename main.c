@@ -4,12 +4,12 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "validate.h"
+#include "types.h"
 #include "map.h"
+#include "validate.h"
 #include "utils.h"
 #include "display.h"
 #include "update.h"
-#include "types.h"
 
 
 int main(int argc, char* argv[]) {
@@ -26,9 +26,8 @@ int main(int argc, char* argv[]) {
 	enum PollenType pollen_type;
 	enum BeehiveAction beehive_action;
 
-	 Map map;
+	Map map;
 	Config config;
-
 
 	if (!validate_config_line(config_line, CONFIG_LINE_LEN, &map.map_size, &config)) {
 		printf("ERROR: Invalid configuration line\n");
@@ -40,13 +39,13 @@ int main(int argc, char* argv[]) {
 
 	read_map(&map, config);
 	printf("Finished reading map....\n");
-	display_map((char *)map.map, map.map_size);
-	printf("\n\n");
+	display_map(&map);
+	/* printf("\n\n"); */
 
-	for (int iter = 0; iter < config.duration; iter++) {
-		map_update(&map, &config);
-		display_map((char *)map.map, map.map_size);
-	}
+	/* for (int iter = 0; iter < config.duration; iter++) { */
+	/* 	map_update(&map, &config); */
+	/* 	display_map((char *)map.map, map.map_size); */
+	/* } */
 
 
 	return 0;
