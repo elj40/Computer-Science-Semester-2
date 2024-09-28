@@ -35,6 +35,7 @@ typedef struct {
 } Hive;
 
 typedef struct Bee {
+	int id;
 	int row;
 	int col;
 	int speed;

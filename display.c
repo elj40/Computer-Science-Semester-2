@@ -38,6 +38,7 @@
 #include "display.h"
 #include "types.h"
 #include "map.h"
+#include "update.h"
 
 int bee_linked_list_len(BeeNode *head) {
 	int count = 0;
@@ -60,6 +61,8 @@ char get_display_char(Cell c) {
 	/* int wasp_count += bee_linked_list_len(c.wasp_head_ptr); */
 
 	count += bee_count;
+	/* printf("Found %d bees\n", count); */
+
 	if (count > 1) return 'm';
 	else if (bee_count == 1) return 'b'; //TODO: make more general
 	/* else if (wasp_count == 1) return 'w'; */
@@ -72,6 +75,7 @@ void display_map(Map *map) {
 	
 	for (int i = 0 ; i < map->map_size; i++) {
 		for (int j = 0 ; j < map->map_size; j++) {
+			/* printf("Finding char at %d, %d\n", i, j); */
 			char_map[i][j] = get_display_char(map->map[i][j]);
 		}
 	}

@@ -5,6 +5,7 @@
 
 #include "map.h"
 #include "types.h"
+#include "update.h"
 #include "utils.h"
 
 #define INPUT_LINE_LEN 50
@@ -100,29 +101,16 @@ void add_flower(Map *m,  Flower f) {
 	c->display_char = 'F';
 	c->flower_ptr = &f;
 }
-void bee_append_to_linked_list(BeeNode **head, Bee bee) {
-	BeeNode *new_node = (BeeNode *) malloc(sizeof(BeeNode));
-	new_node->bee = bee;
-	new_node->next_ptr = NULL;
-
-	if (*head == NULL) {
-		*head = new_node;
-		return;
-	}
-
-	BeeNode *current_bee_node = *head;
-	while (current_bee_node->next_ptr != NULL) {
-		current_bee_node = current_bee_node->next_ptr;
-	}
-	current_bee_node->next_ptr = new_node;
-}
 
 void add_bee(Map *m, Bee b) {
-	printf("Adding bee-> row: %3d, col: %3d, speed: %3d, percep: %3d\n", b.row, b.col, b.speed, b.perception);
+	static int id = 0;
+	printf("Adding bee-> row: %3d, col: %3d, speed: %3d, percep: %3d, id:%3d\n", b.row, b.col, b.speed, b.perception, id);
 	Cell *c = &m->map[b.row][b.col];
 	c->bee_head_ptr = NULL;
 
-	bee_append_to_linked_list(&c->bee_head_ptr, b);
+	b.id = id;
+	add_bee_to_cell(&c->bee_head_ptr, b);
+	id++;
 }
 
 
