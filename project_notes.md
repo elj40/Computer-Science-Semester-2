@@ -52,6 +52,9 @@
 
 ### Action ideas
 - have function that checks what objects are in the block it is currently in
+- If we update wasps last it lets us not have to check for wasps from bees perspective
+- Since some of the action functions (bees + wasp on flower) can only be done once all moves
+ are complete, it is probably better to have seperate loops for movement and action
 
 # Design Ideas
 - OOP
@@ -75,6 +78,21 @@
     - add to ignore list?
 - Must be able to have each agent act independently
     - OOP
+
+## Map idea
+- 2d array of cells (linked list)
+    - Each cell has pointer to static (beehive, wasp hive or flower)
+    - Each cell has pointer to head and tail of linked list for each type of entity
+    - Whenever an object moves into the cell it gets appended to the tail (do we need tail?)
+    - Whenever an object moves out of the cell, remove it from the linked list
+    - The above should probably be a linked list for each type of entity (wasp, each type of bee)
+    
+- This means every bee should havea pointer to a next bee and a previous bee
+- This will also make deleting bees very easy, as we can just remove them and not put them anywhere else
+- Can also set static pointer to null to forget flowers
+- Displaying: 
+    - can have a display char that remains constant if it represents a static (e.g. will always show `F` even if flower is forgotten 
+
 
 
 ## Pseudocode
