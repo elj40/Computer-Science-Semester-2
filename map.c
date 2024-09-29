@@ -113,6 +113,7 @@ void add_flower(Map *m, Flower f) {
 	Flower *f_ptr = (Flower *) malloc(sizeof(Flower));
 	f_ptr->pollen_len = f.pollen_len;
 	f_ptr->pollen_type = f.pollen_type;
+	f_ptr->fight = false;
 
 	memcpy(f_ptr->pollen, f.pollen, sizeof(f.pollen));
 

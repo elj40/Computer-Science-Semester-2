@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #include "types.h"
@@ -38,10 +39,12 @@ void bee_action(Bee * bee, Map *map) {
 
 	int r = bee->row;
 	int c = bee->col;
+	int pollen_len;
+	int total_bees_count;
 	cell = &map->map[r][c];
 	next_cell = &map->next_map[r][c];
 
-	printf("Doing bee action: %c %d %d\n", cell->display_char, r, c );
+	/* printf("Doing bee action: %c %d %d\n", cell->display_char, r, c ); */
 
 	if (cell->display_char == 'W') {
 		remove_bee_from_cell(&next_cell->bee_head_ptr, *bee);
@@ -51,10 +54,23 @@ void bee_action(Bee * bee, Map *map) {
 		&& cell->flower_ptr->pollen_len > 0 
 		&& (bee->state == SEEK || bee->state == WANDER)) 
 	{
-		int bee_count = bee_linked_list_len(next_cell->bee_head_ptr);
-		printf("Found %d bees at flower\n", bee_count);
-		bee_print_list(next_cell->bee_head_ptr);
-		bee_land_on_flower(bee, cell);
+
+		int this_bee_pos = bee_linked_list_get_node_pos(next_cell->bee_head_ptr, *bee);
+		total_bees_count = bee_linked_list_len(next_cell->bee_head_ptr);
+
+		/* printf("Total bees count %d\n" , total_bees_count); */
+
+		pollen_len = cell->flower_ptr->pollen_len;
+
+		/* printf("Pollen %d, Bee pos %d\n", pollen_len, this_bee_pos); */
+
+		if (total_bees_count > pollen_len && this_bee_pos == 0) {
+			cell->flower_ptr->fight = true;
+		}
+
+		if (cell->flower_ptr->fight) bee->state = WANDER;
+		else bee_land_on_flower(bee,cell);
+
 		return;
 	}
 	
@@ -123,7 +139,7 @@ void add_bee_to_cell(BeeNode **head, Bee bee) {
 	current_bee_node->next_ptr = new_node;
 }
 
-Trajectory bee_get_next_trajectory( Bee *bee,  Map *map) {
+Trajectory bee_get_next_trajectory(Bee *bee,  Map *map) {
 	int flower_r, flower_c;
 	bee_check_for_flowers(bee, map, &flower_r, &flower_c);
 

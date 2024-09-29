@@ -12,6 +12,17 @@
 /* 	} */
 /* 	current_wasp->next_ptr = wasp; */
 /* } */
+int bee_linked_list_get_node_pos(BeeNode * head, Bee bee) {
+	BeeNode * current = head;
+	int pos = 0;
+	while (current != NULL) {
+		if (current->bee.id == bee.id) return pos;
+		current = current->next_ptr;
+		pos++;
+	}
+	//Not found
+	return -1;
+}
 int bee_linked_list_len(BeeNode *head) {
 	int count = 0;
 

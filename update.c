@@ -65,6 +65,7 @@ void map_update( Map *map, Config *config) {
 	int ms = map->map_size;
 	Cell *c;
 	printf("\nBefore:\n");
+
 	for (int i = 0; i < ms; i++) {
 		for (int j = 0; j < ms; j++) {
 			c = &map->map[i][j];
@@ -95,6 +96,17 @@ void map_update( Map *map, Config *config) {
 			// Do wasp actions before bee actions because wasps can kill bees and not vice versa
 			action_wasps_in_cell(c, map);
 			action_bees_in_cell(c, map);
+		}
+
+	}
+	for (int i = 0; i < ms; i++) {
+		for (int j = 0; j < ms; j++) {
+			c = &map->next_map[i][j];
+
+			// Reset states of static objects
+			if (c->display_char == 'F') {
+				c->flower_ptr->fight = false;
+			}
 		}
 
 	}

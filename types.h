@@ -1,6 +1,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include <stdbool.h>
 #define MAX_MAP_SIZE 100
 #define MAX_FLOWER_POLLEN 100
 #define MAX_BEE_POLLEN 200
@@ -77,6 +78,7 @@ typedef struct {
 	int row;
 	int col;
 	int pollen_len;
+	bool fight;
 	enum PollenType pollen_type;
 	union Pollen pollen[MAX_FLOWER_POLLEN];
 } Flower;

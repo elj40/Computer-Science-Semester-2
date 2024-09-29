@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include "types.h"
 
+int bee_linked_list_get_node_pos(BeeNode * head, Bee bee);
 int wasp_linked_list_len(WaspNode *head);
 int bee_linked_list_len(BeeNode *head);
 void split_string(char *buffer[], int buf_len, char *string, const char *delims);

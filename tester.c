@@ -16,9 +16,10 @@
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 void test_compass(int row, int col, int speed, int size, int moves);
+void test_linked_list_get_pos();
 void test_linked_list();
 void test_move_bee_between_cells();
-void test_add_pollen(Flower f);
+void test_add_pollen();
 int round_away_from_zero(float n);
 
 int main(int argc, char* argv[]) {
@@ -66,18 +67,15 @@ int main(int argc, char* argv[]) {
 	printf("\n");
 	printf("test_compass\n");
 	/* test_compass(1,1,1,10,8); */
-	printf("\n");
 	/* test_compass(2,1,2,10,8); */
-	printf("\n");
 	/* test_compass(8,8,2,10,8); */
 
 
 	/* test_linked_list(); */
 	/* test_move_bee_between_cells(); */
+	/* test_add_pollen(); */
 
-	Flower fl = { .pollen_len=0 };
-	test_add_pollen(fl);
-	print_flower(fl);
+	test_linked_list_get_pos();
 
 	return 0;
 }
@@ -97,10 +95,7 @@ void test_compass(int row, int col, int speed, int size, int moves) {
 	for (int s = 1; s < 4; s++) {
 		printf("\n");
 		for (int i = 0; i < moves; i++) {
-			/* float dir = get_next_trajectory(); */
 			float dir = i * M_PI/4;
-
-
 
 			float cos_dir = cos(dir);
 			float sin_dir = sin(dir);
@@ -119,12 +114,6 @@ void test_compass(int row, int col, int speed, int size, int moves) {
 
 			nc = MIN(size-1, MAX(nc, 0));
 			nr = MIN(size-1, MAX(nr, 0));
-
-
-
-
-
-
 
 			printf("r:%d, c:%d, dist:%d, dir:%5.1f -> nr:%d, nc:%d\n",row, col, s, dir / M_PI * 180, nr, nc);
 		}
@@ -177,14 +166,49 @@ void test_move_bee_between_cells() {
 	bee_free_linked_list(c2.bee_head_ptr);	
 }
 
-void test_add_pollen(Flower f) {
+void test_add_pollen() {
+	Flower f = { .pollen_len=0 };
 	union Pollen pollen;
-	pollen.string_info = "hello";
 
-	add_pollen(&f, pollen);
+	// Use string copy here rather, that was the fix
+/* 	pollen.string_info = "hello"; */
 
-	pollen.string_info = "bob";
+/* 	add_pollen(&f, pollen); */
 
-	add_pollen(&f, pollen);
+/* 	pollen.string_info = "bob"; */
+
+/* 	add_pollen(&f, pollen); */
+
+/* 	print_flower(f); */
+}
+
+void test_linked_list_get_pos() {
+	printf("\nTesting bee_linked_list_get_pos\n");
+	BeeNode *head = NULL;
+
+	Bee b0 = { .id=0 };
+	Bee b1 = { .id=1 };
+	Bee b2 = { .id=2 };
+	Bee b3 = { .id=3 };
+
+	add_bee_to_cell(&head, b0);
+	add_bee_to_cell(&head, b1);
+	add_bee_to_cell(&head, b2);
+
+	bee_print_list(head);
+
+	int b0_pos = bee_linked_list_get_node_pos(head, b0);
+	int b1_pos = bee_linked_list_get_node_pos(head, b1);
+	int b2_pos = bee_linked_list_get_node_pos(head, b2);
+	int b3_pos = bee_linked_list_get_node_pos(head, b3);
+
+	assert(b0_pos == 0 && "Did not get correct position for b0");
+	printf(".");
+	assert(b1_pos == 1 && "Did not get correct position for b1");
+	printf(".");
+	assert(b2_pos == 2 && "Did not get correct position for b2");
+	printf(".");
+	assert(b3_pos == -1 && "Did not get correct position for b3");
+	printf(".");
 
 }
