@@ -4,6 +4,7 @@
 
 #include "types.h"
 #include "map.h"
+#include "utils.h"
 #include "update.h"
 #include "compass.h"
 #include "bee.h"
@@ -35,12 +36,12 @@ void bee_action(Bee * bee, Map *map) {
 	Cell *next_cell;
 	BeeNode *bee_current_head;
 
-	int or = bee->row;
-	int oc = bee->col;
-	cell = &map->map[or][oc];
-	next_cell = &map->next_map[or][oc];
+	int r = bee->row;
+	int c = bee->col;
+	cell = &map->map[r][c];
+	next_cell = &map->next_map[r][c];
 
-	printf("Doing bee action: %c %d %d\n", cell->display_char, or, oc );
+	printf("Doing bee action: %c %d %d\n", cell->display_char, r, c );
 
 	if (cell->display_char == 'W') {
 		remove_bee_from_cell(&next_cell->bee_head_ptr, *bee);
@@ -50,6 +51,9 @@ void bee_action(Bee * bee, Map *map) {
 		&& cell->flower_ptr->pollen_len > 0 
 		&& (bee->state == SEEK || bee->state == WANDER)) 
 	{
+		int bee_count = bee_linked_list_len(next_cell->bee_head_ptr);
+		printf("Found %d bees at flower\n", bee_count);
+		bee_print_list(next_cell->bee_head_ptr);
 		bee_land_on_flower(bee, cell);
 		return;
 	}
