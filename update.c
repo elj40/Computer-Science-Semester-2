@@ -55,7 +55,7 @@ void move_wasps_in_cell(Cell *c, Map *m) {
 }
 
 void print_flower(Flower f) {
-	printf("Pollen count: %d, pollen: %p ", f.pollen_len, f.pollen);
+	printf("Pollen count: %d, pollen: ", f.pollen_len);
 	for (int i = 0; i < f.pollen_len; i++) {
 		printf("%s, ", f.pollen[i].string_info);
 	}

@@ -154,9 +154,6 @@ void add_wasp(Map *m,  Wasp w) {
 
 void add_pollen(Flower *f, union Pollen p) {
 	// TODO: consider making pollen a linked list too
-	
-	print_flower(*f);
-
 	if (f->pollen_type == 0) 
 		printf("Adding pollen-> info_f: %f\n", p.float_info);
 	else if (f->pollen_type == 1)
@@ -168,8 +165,6 @@ void add_pollen(Flower *f, union Pollen p) {
 	}else {
 		printf("ERROR: overflow of pollens, could not add latest pollen\n");
 	}
-
-	print_flower(*f);
 }
 
 void read_map(Map *map, Config c) {
@@ -233,8 +228,7 @@ void read_map(Map *map, Config c) {
 
 
 			}
-			printf("Flower just made: ");
-			print_flower(flower);
+			/* print_flower(flower); */
 			add_flower(map, flower);
 		}
 		else if (object == 'B' || object == 'H' || object == 'D') {

@@ -45,7 +45,7 @@ void bee_action(Bee * bee, Map *map) {
 		remove_bee_from_cell(&next_cell->bee_head_ptr, *bee);
 		return;
 	}
-	if (cell->display_char == 'F' && cell->flower_ptr->pollen_len > 0) {
+	if (cell->display_char == 'F' && cell->flower_ptr->pollen_len > 0 && bee->state == SEEK) {
 		Flower *flower_ptr = cell->flower_ptr;
 
 		int l = flower_ptr->pollen_len;
@@ -63,6 +63,10 @@ void bee_action(Bee * bee, Map *map) {
 		}
 
 		flower_ptr->pollen_len--;
+		printf("Picked up pollen -> ");
+		print_flower(*flower_ptr);
+
+		bee->state = RETURN;
 		return;
 	}
 	
