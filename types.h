@@ -6,6 +6,7 @@
 #define MAX_BEE_POLLEN 200
 #define MAX_HIVE_POLLINATORS 200
 #define MAX_POLLEN_LEN 100
+#define MAX_POLLEN_CHARS 50
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
@@ -21,7 +22,7 @@ enum PollinatorState { WANDER, RETURN, SEEK };
 
 union Pollen {
 	float float_info;
-	char *string_info;
+	char string_info[MAX_POLLEN_CHARS];
 };
 
 typedef struct {

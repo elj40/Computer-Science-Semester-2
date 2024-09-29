@@ -55,7 +55,11 @@ void move_wasps_in_cell(Cell *c, Map *m) {
 }
 
 void print_flower(Flower f) {
-	printf("Pollen count: %d, pollen: %s,...\n", f.pollen_len, f.pollen[0].string_info);
+	printf("Pollen count: %d, pollen: %p ", f.pollen_len, f.pollen);
+	for (int i = 0; i < f.pollen_len; i++) {
+		printf("%s, ", f.pollen[i].string_info);
+	}
+	printf("\n");
 }
 void map_update( Map *map, Config *config) {
 	int ms = map->map_size;
@@ -70,8 +74,7 @@ void map_update( Map *map, Config *config) {
 			}
 
 			if (c->display_char == 'F') {
-				/* printf("Pollen count: %d, pollen: %s,...\n", c->flower.pollen_len, c->flower.pollen[0].string_info); */
-				/* print_flower(c->flower); */
+				print_flower(*c->flower_ptr);
 			}
 		}
 

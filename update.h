@@ -1,6 +1,7 @@
 #ifndef UPDATE_H
 #define UPDATE_H
 
+void print_flower(Flower f);
 void bee_move( Bee *bee,  Map *map);
 void wasp_move( Wasp *wasp,  Map *map);
 void bee_update( Bee *bee,  Map *map, Config *config);

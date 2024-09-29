@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "types.h"
 #include "map.h"
@@ -46,22 +47,20 @@ void bee_action(Bee * bee, Map *map) {
 	}
 	if (cell->display_char == 'F' && cell->flower_ptr->pollen_len > 0) {
 		Flower *flower_ptr = cell->flower_ptr;
-		printf("I die after this %p\n", flower_ptr);
 
 		int l = flower_ptr->pollen_len;
 		enum PollenType t = flower_ptr->pollen_type;
 		union Pollen p = flower_ptr->pollen[l-1];
-		printf("I die after this\n");
 
 		switch (t) {
 			case FLOAT:
 				bee->pollen.float_info = p.float_info;
 				break;
 			case STRING:
-				bee->pollen.string_info = p.string_info;
+				/* bee->pollen.string_info = p.string_info; */
+				strncpy(bee->pollen.string_info, p.string_info, MAX_POLLEN_CHARS);
 				break;
 		}
-		printf("I die after this\n");
 
 		flower_ptr->pollen_len--;
 		return;

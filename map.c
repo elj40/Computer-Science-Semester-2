@@ -78,8 +78,8 @@ void free_map(Map *map) {
 	for (int i = 0; i < ms; i++) {
 		for (int j = 0; j < ms; j++) {
 			Cell c = map->map[i][j];
-			/* free(c.flower_ptr); */
-			/* free(c.hive_ptr); */
+			free(c.flower_ptr);
+			free(c.hive_ptr);
 			bee_free_linked_list(c.bee_head_ptr);
 			wasp_free_linked_list(c.wasp_head_ptr);
 		}
@@ -113,11 +113,8 @@ void add_flower(Map *m, Flower f) {
 	Flower *f_ptr = (Flower *) malloc(sizeof(Flower));
 	f_ptr->pollen_len = f.pollen_len;
 	f_ptr->pollen_type = f.pollen_type;
-	/* f_ptr->pollen = (union Pollen *) malloc(sizeof(union Pollen)); */
 
-	for (int i = 0 ; i < f.pollen_len; i++) {
-		f_ptr->pollen[i] = f.pollen[i];
-	}
+	memcpy(f_ptr->pollen, f.pollen, sizeof(f.pollen));
 
 
 	if (c->display_char != ' ') {
@@ -128,8 +125,7 @@ void add_flower(Map *m, Flower f) {
 	c->display_char = 'F';
 	c->flower_ptr = f_ptr;
 
-	int l= c->flower_ptr->pollen_len;
-	/* printf("Pollen count: %d, pollen: %s,...\n", c->flower_ptr->pollen_len, c->flower_ptr->pollen[0].string_info); */
+	/* print_flower(*c->flower_ptr); */
 }
 
 void add_bee(Map *m, Bee b) {
@@ -158,16 +154,22 @@ void add_wasp(Map *m,  Wasp w) {
 
 void add_pollen(Flower *f, union Pollen p) {
 	// TODO: consider making pollen a linked list too
+	
+	print_flower(*f);
+
 	if (f->pollen_type == 0) 
 		printf("Adding pollen-> info_f: %f\n", p.float_info);
 	else if (f->pollen_type == 1)
 		printf("Adding pollen-> info_s: %s\n", p.string_info);
+
 	if (f->pollen_len < MAX_FLOWER_POLLEN) {
 		f->pollen[f->pollen_len] = p;
 		f->pollen_len++;
 	}else {
 		printf("ERROR: overflow of pollens, could not add latest pollen\n");
 	}
+
+	print_flower(*f);
 }
 
 void read_map(Map *map, Config c) {
@@ -196,13 +198,12 @@ void read_map(Map *map, Config c) {
 		if (x >= map->map_size) invalid_object_setup(current_line);
 		if (y >= map->map_size) invalid_object_setup(current_line);
 
-		
-
 		int speed;
 		int perception;
+		union Pollen pollen;
 		if (object == 'F') {
-			// Do some weird semicolons because of the switch case
-			Flower flower = { .row = y, 
+			Flower flower = { 
+				.row = y, 
 				.col = x, 
 				.pollen_len = 0,
 				.pollen_type = c.pollen_type
@@ -220,18 +221,20 @@ void read_map(Map *map, Config c) {
 				char *pollen_v = strtok(pollen_value, "\n");
 
 				if (c.pollen_type == FLOAT) {
-					union Pollen pollen;
 					if (!string_to_float(&pollen.float_info, pollen_v)) 
 						invalid_object_setup(current_line);
 					add_pollen(&flower, pollen);
 				}
 				else if (c.pollen_type == STRING) {
-					union Pollen pollen = { .string_info = pollen_v };
+					printf("Pollen value: %s\n", pollen_v);
+					strncpy(pollen.string_info, pollen_v, MAX_POLLEN_CHARS);
 					add_pollen(&flower, pollen);
 				}
 
 
 			}
+			printf("Flower just made: ");
+			print_flower(flower);
 			add_flower(map, flower);
 		}
 		else if (object == 'B' || object == 'H' || object == 'D') {

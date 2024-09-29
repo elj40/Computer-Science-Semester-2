@@ -18,6 +18,7 @@
 void test_compass(int row, int col, int speed, int size, int moves);
 void test_linked_list();
 void test_move_bee_between_cells();
+void test_add_pollen(Flower f);
 int round_away_from_zero(float n);
 
 int main(int argc, char* argv[]) {
@@ -72,8 +73,11 @@ int main(int argc, char* argv[]) {
 
 
 	/* test_linked_list(); */
-	test_move_bee_between_cells();
+	/* test_move_bee_between_cells(); */
 
+	Flower fl = { .pollen_len=0 };
+	test_add_pollen(fl);
+	print_flower(fl);
 
 	return 0;
 }
@@ -171,4 +175,16 @@ void test_move_bee_between_cells() {
 
 	bee_free_linked_list(c1.bee_head_ptr);	
 	bee_free_linked_list(c2.bee_head_ptr);	
+}
+
+void test_add_pollen(Flower f) {
+	union Pollen pollen;
+	pollen.string_info = "hello";
+
+	add_pollen(&f, pollen);
+
+	pollen.string_info = "bob";
+
+	add_pollen(&f, pollen);
+
 }
