@@ -99,7 +99,8 @@ void add_hive(Map *m,  Hive h) {
 	}
 
 	c->display_char = h.type;
-	c->hive_ptr = &h;
+	c->hive_ptr = (Hive *) malloc(sizeof(Hive));
+	*c->hive_ptr = h;
 }
 
 
@@ -135,7 +136,12 @@ void add_bee(Map *m, Bee b) {
 	Cell *c = &m->map[b.row][b.col];
 	/* c->bee_head_ptr = NULL; */
 
+	if (c->hive_ptr == NULL) {
+		printf("ERROR: no hive found at %d %d, make sure to place a hive before adding bees there\n");
+		exit(1);
+	}
 	b.id = id;
+	b.hive_ptr = c->hive_ptr;
 	add_bee_to_cell(&c->bee_head_ptr, b);
 	/* bee_print_list(c->bee_head_ptr); */
 	id++;
@@ -238,6 +244,7 @@ void read_map(Map *map, Config c) {
 				.col = x, 
 				.type=object, 
 			};
+			add_hive(map, hive);
 
 			if (n > 0) {
 			char bee_line[BEE_MAX_CHARS];
@@ -266,7 +273,6 @@ void read_map(Map *map, Config c) {
 				add_bee(map, bee);
 			}
 			}
-			add_hive(map, hive);
 		}
 		else if (object == 'W') {
 			 Hive hive = { 

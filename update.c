@@ -20,7 +20,7 @@
 /* If a bee’s magnitude is too large and it flies over a flower or hive, it overshoots them and does not interact with them. The same applied for wasps. */
 
 void action_bees_in_cell(Cell *c, Map *m) {
-
+	/* printf("Doing bee actions\n"); */
 	BeeNode *current = c->bee_head_ptr;
 	while (current != NULL) {
 		/* printf("Moving bee %d\n", current->bee.id); */
@@ -84,18 +84,18 @@ void map_update( Map *map, Config *config) {
 		for (int j = 0; j < ms; j++) {
 			c = &map->map[i][j];
 
-			move_bees_in_cell(c, map);
-			move_wasps_in_cell(c, map);
+			// Do wasp actions before bee actions because wasps can kill bees and not vice versa
+			action_wasps_in_cell(c, map);
+			action_bees_in_cell(c, map);
 		}
 
 	}
 	for (int i = 0; i < ms; i++) {
 		for (int j = 0; j < ms; j++) {
-			c = &map->next_map[i][j];
+			c = &map->map[i][j];
 
-			// Do wasp actions before bee actions because wasps can kill bees and not vice versa
-			action_wasps_in_cell(c, map);
-			action_bees_in_cell(c, map);
+			move_bees_in_cell(c, map);
+			move_wasps_in_cell(c, map);
 		}
 
 	}

@@ -12,7 +12,7 @@
 
 void bee_land_on_flower(Bee *bee, Cell *cell);
 void print_bee(Bee b) {
-	printf("Bee:  r:%d c:%d id:%d\n", b.row, b.col, b.id);
+	printf("Bee:\tr:%d c:%d id:%d state:%d\n", b.row, b.col, b.id, b.state);
 }
 void bee_print_list(BeeNode * head) {
 	BeeNode * current = head;
@@ -46,6 +46,8 @@ void bee_action(Bee * bee, Map *map) {
 
 	/* printf("Doing bee action: %c %d %d\n", cell->display_char, r, c ); */
 
+	//Special behviours
+
 	if (cell->display_char == 'W') {
 		remove_bee_from_cell(&next_cell->bee_head_ptr, *bee);
 		return;
@@ -55,25 +57,34 @@ void bee_action(Bee * bee, Map *map) {
 		&& (bee->state == SEEK || bee->state == WANDER)) 
 	{
 
-		int this_bee_pos = bee_linked_list_get_node_pos(next_cell->bee_head_ptr, *bee);
-		total_bees_count = bee_linked_list_len(next_cell->bee_head_ptr);
+		int this_bee_pos = bee_linked_list_get_node_pos(cell->bee_head_ptr, *bee);
+		total_bees_count = bee_linked_list_len(cell->bee_head_ptr);
 
-		/* printf("Total bees count %d\n" , total_bees_count); */
 
 		pollen_len = cell->flower_ptr->pollen_len;
-
-		/* printf("Pollen %d, Bee pos %d\n", pollen_len, this_bee_pos); */
 
 		if (total_bees_count > pollen_len && this_bee_pos == 0) {
 			cell->flower_ptr->fight = true;
 		}
 
-		if (cell->flower_ptr->fight) bee->state = WANDER;
-		else bee_land_on_flower(bee,cell);
+		if (cell->flower_ptr->fight) {
+			bee->state = WANDER;
+			printf("Plant fighting, leaving now\n");
+		}
+		else {
+			bee_land_on_flower(bee,cell);
+			bee->state = RETURN;
+		}
 
 		return;
 	}
 	
+	//Usual behaviour
+	bool flower_close = bee_check_for_flowers(bee, map);
+	/* printf("Flower close? %d\n", flower_close); */
+	if (bee->state == RETURN) return;
+	if (flower_close) bee->state = SEEK;
+	else bee->state = WANDER;
 }
 
 void bee_land_on_flower(Bee *bee, Cell *cell) {
@@ -96,12 +107,9 @@ void bee_land_on_flower(Bee *bee, Cell *cell) {
 	flower_ptr->pollen_len--;
 	printf("Picked up pollen -> ");
 	print_flower(*flower_ptr);
-
-	bee->state = RETURN;
 }
 
 void bee_move(Bee *bee,  Map *map) {
-	Trajectory t = bee_get_next_trajectory(bee, map);
 	Cell *cell;
 	BeeNode **cell_head;
 
@@ -109,6 +117,7 @@ void bee_move(Bee *bee,  Map *map) {
 	int oc = bee->col;
 	int nr, nc;
 
+	Trajectory t = bee_get_next_trajectory(bee, map);
 	get_next_position_from_trajectory(t, map->map_size-1, or, oc, &nr, &nc);
 
 	bee->row = nr;
@@ -141,24 +150,22 @@ void add_bee_to_cell(BeeNode **head, Bee bee) {
 
 Trajectory bee_get_next_trajectory(Bee *bee,  Map *map) {
 	int flower_r, flower_c;
-	bee_check_for_flowers(bee, map, &flower_r, &flower_c);
+	int hive_r, hive_c;
 
 	if (bee->state == WANDER) 
 	{
-		if (flower_r != -1) 
-		{
-			bee->state = SEEK;
-			return get_trajectory_from_target(bee->row, bee->col, bee->speed, flower_r, flower_c);
-		}
-			
 		return get_random_trajectory(bee->speed);
 	}
 	else if (bee->state == RETURN) 
 	{
-		return get_random_trajectory(bee->speed);
+		int hive_r = bee->hive_ptr->row;
+		int hive_c = bee->hive_ptr->col;
+
+		return get_trajectory_from_target(bee->row, bee->col, bee->speed, hive_r, hive_c);
 	}
 	else if (bee->state == SEEK)
 	{
+		bee_locate_flowers(bee, map, &flower_r, &flower_c);
 		return get_trajectory_from_target(bee->row, bee->col, bee->speed,flower_r, flower_c);
 	}
 	
@@ -166,7 +173,39 @@ Trajectory bee_get_next_trajectory(Bee *bee,  Map *map) {
 	return get_random_trajectory(bee->speed);
 }
 
-void bee_check_for_flowers( Bee *bee,  Map *m, int *fr, int *fc) {
+bool bee_check_for_flowers(Bee *bee, Map *m) {
+	/* If therr are any flowers, return true most bottom left one
+	 * Find bottom-left and top-right corner
+	 * 	Must be within bounds if map
+	 * Loop from bottom-left to top right
+	 *
+	 * if flower:
+	 * 	if closest to bee:
+	 * 	    save postion
+	 *
+	 * return closest flower
+	 *
+	 * Should work because of the way we loop through (going from bottom to top)
+	 */
+
+	int r = bee->row;
+	int c = bee->col;
+	int p = bee->perception;
+
+	int top = MIN(m->map_size-1, r + p);
+	int bottom = MAX(0, r - p);
+	int right = MIN(m->map_size-1, c + p);
+	int left = MAX(0, c - p);
+
+	for (int y = bottom; y <= top; y++) {
+		for (int x = left; x <= right; x++) {
+			if (m->map[y][x].display_char == 'F') return true;
+		}
+	}
+
+	return false;
+}
+void bee_locate_flowers(Bee *bee, Map *m, int *fr, int *fc) {
 	/* If therr are any flowers, return most bottom left one
 	 * Find bottom-left and top-right corner
 	 * 	Must be within bounds if map

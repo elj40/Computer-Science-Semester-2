@@ -47,14 +47,11 @@ char get_display_char(Cell c) {
 	int count = 0;
 	// Count bees
 	int bee_count = bee_linked_list_len(c.bee_head_ptr);
-	int wasp_count = wasp_linked_list_len(c.wasp_head_ptr);
-
 	// Count wasps
-	/* int wasp_count += bee_linked_list_len(c.wasp_head_ptr); */
+	int wasp_count = wasp_linked_list_len(c.wasp_head_ptr);
 
 	count += bee_count;
 	count += wasp_count;
-	/* printf("Found %d bees\n", count); */
 
 	if (count > 1) return 'm';
 	else if (bee_count == 1) return 'b'; //TODO: make more general
