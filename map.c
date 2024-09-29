@@ -12,15 +12,6 @@
 #define POLLEN_MAX_CHARS 50
 #define BEE_MAX_CHARS 50
 
-// This function might be redundant with new system
-/* void clear_map( Map *map) { */
-/* 	int s = map->map_size; */
-/* 	for (int i = 0 ; i < s; i++) { */
-/* 		for (int j = 0 ; j < s; j++) { */
-/* 			map->map[i][j] = ' '; */
-/* 		} */
-/* 	} */
-/* } */
 void clear_map_cells(Cell *map, int map_size) {
 	int s = map_size;
 	for (int i = 0 ; i < s; i++) {
@@ -72,16 +63,16 @@ void bee_free_linked_list(BeeNode *head) {
 	}	
 }
 
-/* void wasp_free_linked_list(WaspNode *head) { */
-/* 	WaspNode *current = head; */
-/* 	WaspNode *next_bee_ptr; */
+void wasp_free_linked_list(WaspNode *head) {
+	WaspNode *current = head;
+	WaspNode *next_wasp_ptr;
 
-/* 	while (current != NULL) { */
-/* 		*next_bee_ptr = current->next_ptr; */
-/* 		free(current); */
-/* 		current = next_bee_ptr; */
-/* 	} */	
-/* } */
+	while (current != NULL) {
+		next_wasp_ptr = current->next_ptr;
+		free(current);
+		current = next_wasp_ptr;
+	}	
+}
 
 void free_map(Map *map) {
 	int ms = map->map_size;
@@ -90,7 +81,7 @@ void free_map(Map *map) {
 		for (int j = 0; j < ms; j++) {
 			Cell c = map->map[i][j];
 			bee_free_linked_list(c.bee_head_ptr);
-			/* wasp_free_linked_list(c.wasp_head_ptr); */
+			wasp_free_linked_list(c.wasp_head_ptr);
 		}
 
 	}

@@ -4,6 +4,7 @@
 
 #include "map.h"
 #include "bee.h"
+#include "wasp.h"
 #include "types.h"
 #include "update.h"
 #include "compass.h"
@@ -17,17 +18,6 @@
 /* The range of magnitudes of an entity’s trajectories is determined by its speed parameter which is given as an input at the beginning of the simulation. For each iteration of the simulation, the magnitude of an entity move given by its compass will be a value between 0 (inclusive) and speed (inclusive). */ 
 
 /* If a bee’s magnitude is too large and it flies over a flower or hive, it overshoots them and does not interact with them. The same applied for wasps. */
-void print_wasp(Wasp w) {
-	printf("Wasp:  r:%d c:%d id:%d\n", w.row, w.col, w.id);
-}
-void wasp_print_list(WaspNode * head) {
-	WaspNode * current = head;
-
-	while (current != NULL) {
-		print_wasp(current->wasp);
-		current = current->next_ptr;
-	}
-}
 
 void action_bees_in_cell(Cell *c, Map *m) {};
 void action_wasps_in_cell(Cell *c, Map *m) {};
@@ -76,8 +66,9 @@ void map_update( Map *map, Config *config) {
 		for (int j = 0; j < ms; j++) {
 			c = &map->map[i][j];
 
-			action_bees_in_cell(c, map);
+			// Do wasp actions before bee actions because wasps can kill bees and not vice versa
 			action_wasps_in_cell(c, map);
+			action_bees_in_cell(c, map);
 		}
 
 	}
@@ -108,9 +99,6 @@ void map_update( Map *map, Config *config) {
 	clear_map_cells(&map->next_map[0][0], map->map_size);
 }
 
-Trajectory wasp_get_next_trajectory( Wasp *wasp,  Map *map) {
-	return get_random_trajectory(wasp->speed);
-}
 
 void remove_bee_from_cell(BeeNode **head, Bee bee) {
 	BeeNode *current = *head;
@@ -153,42 +141,3 @@ void remove_wasp_from_cell(WaspNode **head, Wasp wasp) {
 }
 
 
-void add_wasp_to_cell(WaspNode **head, Wasp wasp) {
-	WaspNode *new_node = (WaspNode *) malloc(sizeof(WaspNode));
-	new_node->wasp = wasp;
-	new_node->next_ptr = NULL;
-
-	if (*head == NULL) {
-		*head = new_node;
-		return;
-	}
-
-	WaspNode *current_wasp_node = *head;
-	while (current_wasp_node->next_ptr != NULL) {
-		current_wasp_node = current_wasp_node->next_ptr;
-	}
-	current_wasp_node->next_ptr = new_node;
-}
-
-
-
-void wasp_move(Wasp *wasp,  Map *map) {
-	Trajectory t = wasp_get_next_trajectory(wasp, map);
-	Cell *cell;
-	WaspNode **cell_head;
-
-	int or = wasp->row;
-	int oc = wasp->col;
-	int nr, nc;
-
-	get_next_position_from_trajectory(t, map->map_size-1, or, oc, &nr, &nc);
-
-	/* printf("Bee moved from %d,%d to %d,%d\n", or, oc, nr, nc); */
-	wasp->row = nr;
-	wasp->col = nc;
-
-	cell = &map->next_map[nr][nc];
-	cell_head = &cell->wasp_head_ptr;
-	add_wasp_to_cell(cell_head, *wasp);
-
-}
