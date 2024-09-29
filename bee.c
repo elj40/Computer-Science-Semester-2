@@ -18,6 +18,10 @@ void bee_print_list(BeeNode * head) {
 	}
 }
 
+void bee_action(Bee* bee, Map *map) {
+
+}
+
 void bee_move(Bee *bee,  Map *map) {
 	Trajectory t = bee_get_next_trajectory(bee, map);
 	Cell *cell;

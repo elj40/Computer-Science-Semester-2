@@ -38,7 +38,32 @@ void add_wasp_to_cell(WaspNode **head, Wasp wasp) {
 	current_wasp_node->next_ptr = new_node;
 }
 
+void wasp_action(Wasp *wasp, Map *map) {
+	Cell *cell;
+	BeeNode *current_bee_node;
+	BeeNode *next_bee_node;
 
+	int or = wasp->row;
+	int oc = wasp->col;
+
+	cell = &map->next_map[or][oc];
+
+	// if bee lands at same place as wasp, it dies
+	// so free all current bees from memory and then set bee pointer to null
+	// will have to change if not all bees die
+
+	bee_free_linked_list(cell->bee_head_ptr);
+	cell->bee_head_ptr = NULL;
+
+	// Do something like this if we need to remove only some bees with conditions
+	/* current_bee_node = cell->bee_head_ptr; */
+	/* while (current_bee_node != NULL) { */
+	/* 	next_bee_node = current_bee_node->next_ptr; */	
+	/* 	remove_bee_from_cell(cell, current_bee_node->bee); */
+	/* 	current_bee_node = next_bee_node; */
+	/* } */
+	
+}
 
 void wasp_move(Wasp *wasp,  Map *map) {
 	Trajectory t = wasp_get_next_trajectory(wasp, map);

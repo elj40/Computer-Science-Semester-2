@@ -1,8 +1,11 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <stdbool.h>
 #include "types.h"
 
+int wasp_linked_list_len(WaspNode *head);
+int bee_linked_list_len(BeeNode *head);
 void split_string(char *buffer[], int buf_len, char *string, const char *delims);
 bool string_to_int(int *n, char *s);
 bool string_to_float(float *n, char *s);

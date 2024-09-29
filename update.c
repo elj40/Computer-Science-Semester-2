@@ -19,8 +19,22 @@
 
 /* If a bee’s magnitude is too large and it flies over a flower or hive, it overshoots them and does not interact with them. The same applied for wasps. */
 
-void action_bees_in_cell(Cell *c, Map *m) {};
-void action_wasps_in_cell(Cell *c, Map *m) {};
+void action_bees_in_cell(Cell *c, Map *m) {
+	BeeNode *current = c->bee_head_ptr;
+	while (current != NULL) {
+		/* printf("Moving bee %d\n", current->bee.id); */
+		bee_action(&current->bee, m);
+		current = current->next_ptr;
+	}
+};
+void action_wasps_in_cell(Cell *c, Map *m) {
+	WaspNode *current = c->wasp_head_ptr;
+	while (current != NULL) {
+		/* printf("Moving wasp %d\n", current->wasp.id); */
+		wasp_action(&current->wasp, m);
+		current = current->next_ptr;
+	}
+};
 void move_bees_in_cell(Cell *c, Map *m) {
 	BeeNode *current = c->bee_head_ptr;
 	while (current != NULL) {
@@ -48,7 +62,7 @@ void map_update( Map *map, Config *config) {
 			c = &map->map[i][j];
 			if ( c->bee_head_ptr != NULL) {
 				printf("Bees in cell %d, %d:\n", i, j);
-				/* bee_print_list(c->bee_head_ptr); */
+				bee_print_list(c->bee_head_ptr);
 			}
 		}
 
@@ -64,7 +78,7 @@ void map_update( Map *map, Config *config) {
 	}
 	for (int i = 0; i < ms; i++) {
 		for (int j = 0; j < ms; j++) {
-			c = &map->map[i][j];
+			c = &map->next_map[i][j];
 
 			// Do wasp actions before bee actions because wasps can kill bees and not vice versa
 			action_wasps_in_cell(c, map);
@@ -112,7 +126,7 @@ void remove_bee_from_cell(BeeNode **head, Bee bee) {
 			} else {
 				previous->next_ptr = current->next_ptr;
 			}
-			/* free(current); */
+			free(current);
 			return;
 		}
 		previous = current;

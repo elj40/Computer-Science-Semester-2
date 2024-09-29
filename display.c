@@ -39,27 +39,8 @@
 #include "types.h"
 #include "map.h"
 #include "update.h"
+#include "utils.h"
 
-int bee_linked_list_len(BeeNode *head) {
-	int count = 0;
-
-	BeeNode *current = head;
-	while (current != NULL) {
-		count++;
-		current = current->next_ptr;
-	}
-	return count;
-}
-int wasp_linked_list_len(WaspNode *head) {
-	int count = 0;
-
-	WaspNode *current = head;
-	while (current != NULL) {
-		count++;
-		current = current->next_ptr;
-	}
-	return count;
-}
 char get_display_char(Cell c) {
 	if (c.display_char != ' ') return c.display_char;
 

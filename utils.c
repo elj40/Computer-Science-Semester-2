@@ -12,6 +12,26 @@
 /* 	} */
 /* 	current_wasp->next_ptr = wasp; */
 /* } */
+int bee_linked_list_len(BeeNode *head) {
+	int count = 0;
+
+	BeeNode *current = head;
+	while (current != NULL) {
+		count++;
+		current = current->next_ptr;
+	}
+	return count;
+}
+int wasp_linked_list_len(WaspNode *head) {
+	int count = 0;
+
+	WaspNode *current = head;
+	while (current != NULL) {
+		count++;
+		current = current->next_ptr;
+	}
+	return count;
+}
 
 void split_string(char *buffer[], int buf_len, char *string, const char *delims) {
 	char* tok = strtok(string, delims);
