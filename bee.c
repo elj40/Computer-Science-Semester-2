@@ -8,6 +8,7 @@
 #include "compass.h"
 #include "bee.h"
 
+void bee_land_on_flower(Bee *bee, Cell *cell);
 void print_bee(Bee b) {
 	printf("Bee:  r:%d c:%d id:%d\n", b.row, b.col, b.id);
 }
@@ -45,35 +46,38 @@ void bee_action(Bee * bee, Map *map) {
 		remove_bee_from_cell(&next_cell->bee_head_ptr, *bee);
 		return;
 	}
-	if (cell->display_char == 'F' && cell->flower_ptr->pollen_len > 0 && bee->state == SEEK) {
-		Flower *flower_ptr = cell->flower_ptr;
-
-		int l = flower_ptr->pollen_len;
-		enum PollenType t = flower_ptr->pollen_type;
-		union Pollen p = flower_ptr->pollen[l-1];
-
-		switch (t) {
-			case FLOAT:
-				bee->pollen.float_info = p.float_info;
-				break;
-			case STRING:
-				/* bee->pollen.string_info = p.string_info; */
-				strncpy(bee->pollen.string_info, p.string_info, MAX_POLLEN_CHARS);
-				break;
-		}
-
-		flower_ptr->pollen_len--;
-		printf("Picked up pollen -> ");
-		print_flower(*flower_ptr);
-
-		bee->state = RETURN;
+	if (cell->display_char == 'F' 
+		&& cell->flower_ptr->pollen_len > 0 
+		&& (bee->state == SEEK || bee->state == WANDER)) 
+	{
+		bee_land_on_flower(bee, cell);
 		return;
 	}
 	
 }
 
-void bee_land_on_flower(Bee *bee, Cell *c) {
+void bee_land_on_flower(Bee *bee, Cell *cell) {
+	Flower *flower_ptr = cell->flower_ptr;
 
+	int l = flower_ptr->pollen_len;
+	enum PollenType t = flower_ptr->pollen_type;
+	union Pollen p = flower_ptr->pollen[l-1];
+
+	switch (t) {
+		case FLOAT:
+			bee->pollen.float_info = p.float_info;
+			break;
+		case STRING:
+			/* bee->pollen.string_info = p.string_info; */
+			strncpy(bee->pollen.string_info, p.string_info, MAX_POLLEN_CHARS);
+			break;
+	}
+
+	flower_ptr->pollen_len--;
+	printf("Picked up pollen -> ");
+	print_flower(*flower_ptr);
+
+	bee->state = RETURN;
 }
 
 void bee_move(Bee *bee,  Map *map) {
