@@ -35,7 +35,8 @@ int main(int argc, char* argv[]) {
 	}
 
 
-	clear_map(&map);
+	clear_map_cells(&map.map[0][0], map.map_size);
+	clear_map_cells(&map.next_map[0][0], map.map_size);
 
 	read_map(&map, config);
 	printf("Finished reading map....\n");

@@ -20,7 +20,7 @@
 
 /* If a bee’s magnitude is too large and it flies over a flower or hive, it overshoots them and does not interact with them. The same applied for wasps. */
 void print_bee(Bee b) {
-	printf("Bee: r:%d c:%d id:%d\n", b.row, b.col, b.id);
+	printf("Bee:  r:%d c:%d id:%d\n", b.row, b.col, b.id);
 }
 void bee_print_list(BeeNode * head) {
 	BeeNode * current = head;
@@ -56,6 +56,7 @@ void get_next_position_from_trajectory(Trajectory t, int n, int r, int c, int *n
 void move_bees_in_cell(Cell *c, Map *m) {
 	BeeNode *current = c->bee_head_ptr;
 	while (current != NULL) {
+		/* printf("Moving bee %d\n", current->bee.id); */
 		bee_move(&current->bee, m);
 		current = current->next_ptr;
 	}
@@ -64,6 +65,17 @@ void move_bees_in_cell(Cell *c, Map *m) {
 void map_update( Map *map, Config *config) {
 	int ms = map->map_size;
 	Cell *c;
+	printf("\nBefore:\n");
+	for (int i = 0; i < ms; i++) {
+		for (int j = 0; j < ms; j++) {
+			c = &map->map[i][j];
+			if ( c->bee_head_ptr != NULL) {
+				printf("Bees in cell %d, %d:\n", i, j);
+				bee_print_list(c->bee_head_ptr);
+			}
+		}
+
+	}
 	for (int i = 0; i < ms; i++) {
 		for (int j = 0; j < ms; j++) {
 			c = &map->map[i][j];
@@ -76,6 +88,31 @@ void map_update( Map *map, Config *config) {
 		}
 
 	}
+	printf("\nAfter current:\n");
+	for (int i = 0; i < ms; i++) {
+		for (int j = 0; j < ms; j++) {
+			c = &map->map[i][j];
+			if ( c->bee_head_ptr != NULL) {
+				printf("Bees in cell %d, %d:\n", i, j);
+				bee_print_list(c->bee_head_ptr);
+			}
+		}
+
+	}
+	printf("\nAfter next:\n");
+	for (int i = 0; i < ms; i++) {
+		for (int j = 0; j < ms; j++) {
+			c = &map->next_map[i][j];
+			if ( c->bee_head_ptr != NULL) {
+				printf("Bees in cell %d, %d:\n", i, j);
+				bee_print_list(c->bee_head_ptr);
+			}
+		}
+
+	}
+
+	copy_map_enitites(&map->map[0][0], &map->next_map[0][0], map->map_size);
+	clear_map_cells(&map->next_map[0][0], map->map_size);
 	/* 	for (int i = 0; i < map->hive_len; i++) { */
 	/* 		hive_update(&map->hives[i], map, config); */
 	/* 	} */
@@ -199,7 +236,7 @@ void remove_bee_from_cell(BeeNode **head, Bee bee) {
 
 	while (current != NULL) {
 		if (current->bee.id == bee.id) {
-			printf("Removing bee %d\n", bee.id);
+			/* printf("Removing bee %d\n", bee.id); */
 			if (previous == NULL) { // We are at start
 				*head = current->next_ptr;
 			} else {
@@ -214,12 +251,12 @@ void remove_bee_from_cell(BeeNode **head, Bee bee) {
 }
 
 void add_bee_to_cell(BeeNode **head, Bee bee) {
-	printf("Adding bee %d\n", bee.id);
+	/* printf("Adding bee %d\n", bee.id); */
 	BeeNode *new_node = (BeeNode *) malloc(sizeof(BeeNode));
 	new_node->bee = bee;
 	new_node->next_ptr = NULL;
 
-	print_bee(bee);
+	/* print_bee(bee); */
 
 	if (*head == NULL) {
 		*head = new_node;
@@ -245,23 +282,22 @@ void bee_move( Bee *bee,  Map *map) {
 
 	get_next_position_from_trajectory(t, map->map_size-1, or, oc, &nr, &nc);
 
-	printf("Bee moved from %d,%d to %d,%d\n", or, oc, nr, nc);
+	/* printf("Bee moved from %d,%d to %d,%d\n", or, oc, nr, nc); */
+	bee->row = nr;
+	bee->col = nc;
 
-	cell = &map->map[nr][nc];
+	cell = &map->next_map[nr][nc];
 	cell_head = &cell->bee_head_ptr;
 	add_bee_to_cell(cell_head, *bee);
 
-	printf("Bees at next cell\n");
-	bee_print_list(*cell_head);
+	/* printf("Bees at next cell\n"); */
+	/* bee_print_list(*cell_head); */
 
-	cell = &map->map[or][oc];
-	cell_head = &cell->bee_head_ptr;
-	remove_bee_from_cell(cell_head, *bee); 
+	/* cell = &map->next_map[or][oc]; */
+	/* cell_head = &cell->bee_head_ptr; */
+	/* remove_bee_from_cell(cell_head, *bee); */ 
 
 
-
-	bee->row = nr;
-	bee->col = nc;
 }
 
 

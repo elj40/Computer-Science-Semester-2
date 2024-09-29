@@ -1,16 +1,23 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <string.h>
 #include <stdbool.h>
 #include <assert.h>
 
-#include "utils.h"
 #include "types.h"
+#include "utils.h"
+#include "map.h"
+#include "update.h"
+#include "validate.h"
+#include "compass.h"
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 void test_compass(int row, int col, int speed, int size, int moves);
+void test_linked_list();
+void test_move_bee_between_cells();
 int round_away_from_zero(float n);
 
 int main(int argc, char* argv[]) {
@@ -57,12 +64,22 @@ int main(int argc, char* argv[]) {
 
 	printf("\n");
 	printf("test_compass\n");
-	test_compass(1,1,1,10,8);
+	/* test_compass(1,1,1,10,8); */
 	printf("\n");
-	test_compass(2,1,2,10,8);
+	/* test_compass(2,1,2,10,8); */
 	printf("\n");
-	test_compass(8,8,2,10,8);
+	/* test_compass(8,8,2,10,8); */
+
+
+	/* test_linked_list(); */
+	test_move_bee_between_cells();
+
+
 	return 0;
+}
+int round_away_from_zero(float n) {
+	if (n < 0) return (int)-round(-n);
+	return (int)round(n);
 }
 
 void test_compass(int row, int col, int speed, int size, int moves) {
@@ -110,7 +127,48 @@ void test_compass(int row, int col, int speed, int size, int moves) {
 	}
 }
 
-int round_away_from_zero(float n) {
-	if (n < 0) return (int)-round(-n);
-	return (int)round(n);
+void test_linked_list() {
+	BeeNode *head = NULL;
+
+	Bee b1 = { .row=1, .col=1, .id=0 };
+	Bee b2 = { .row=2, .col=2, .id=1 };
+	Bee b3 = { .row=3, .col=3, .id=2 };
+	
+	add_bee_to_cell(&head, b1); 
+	add_bee_to_cell(&head, b2); 
+	add_bee_to_cell(&head, b3); 
+	printf("Printing bee list\n");
+	bee_print_list(head);
+
+	remove_bee_from_cell(&head, b2);
+	remove_bee_from_cell(&head, b1);
+	printf("Printing bee list\n");
+	bee_print_list(head);
+
+	bee_free_linked_list(head);	
+}
+
+void test_move_bee_between_cells() {
+	Cell c1, c2;
+	c1.bee_head_ptr = NULL;
+	c2.bee_head_ptr = NULL;
+
+	Bee b1 = { .row=1, .col=1, .id=0 };
+	Bee b2 = { .row=2, .col=2, .id=1 };
+	Bee b3 = { .row=3, .col=3, .id=2 };
+
+	add_bee_to_cell(&c1.bee_head_ptr, b1);
+	printf("Iniitally in cell 1\n");
+	bee_print_list(c1.bee_head_ptr);
+
+	remove_bee_from_cell(&c1.bee_head_ptr, b1);
+	add_bee_to_cell(&c2.bee_head_ptr, b1);
+
+	printf("After in cell 1\n");
+	bee_print_list(c1.bee_head_ptr);
+	printf("After in cell 2\n");
+	bee_print_list(c2.bee_head_ptr);
+
+	bee_free_linked_list(c1.bee_head_ptr);	
+	bee_free_linked_list(c2.bee_head_ptr);	
 }
