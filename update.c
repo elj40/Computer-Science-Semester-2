@@ -20,6 +20,7 @@
 /* If a bee’s magnitude is too large and it flies over a flower or hive, it overshoots them and does not interact with them. The same applied for wasps. */
 
 void action_bees_in_cell(Cell *c, Map *m) {
+
 	BeeNode *current = c->bee_head_ptr;
 	while (current != NULL) {
 		/* printf("Moving bee %d\n", current->bee.id); */
@@ -53,6 +54,9 @@ void move_wasps_in_cell(Cell *c, Map *m) {
 	}
 }
 
+void print_flower(Flower f) {
+	printf("Pollen count: %d, pollen: %s,...\n", f.pollen_len, f.pollen[0].string_info);
+}
 void map_update( Map *map, Config *config) {
 	int ms = map->map_size;
 	Cell *c;
@@ -63,6 +67,11 @@ void map_update( Map *map, Config *config) {
 			if ( c->bee_head_ptr != NULL) {
 				printf("Bees in cell %d, %d:\n", i, j);
 				bee_print_list(c->bee_head_ptr);
+			}
+
+			if (c->display_char == 'F') {
+				/* printf("Pollen count: %d, pollen: %s,...\n", c->flower.pollen_len, c->flower.pollen[0].string_info); */
+				/* print_flower(c->flower); */
 			}
 		}
 
@@ -86,28 +95,28 @@ void map_update( Map *map, Config *config) {
 		}
 
 	}
-	printf("\nAfter current:\n");
-	for (int i = 0; i < ms; i++) {
-		for (int j = 0; j < ms; j++) {
-			c = &map->map[i][j];
-			if ( c->bee_head_ptr != NULL) {
-				printf("Bees in cell %d, %d:\n", i, j);
-				/* bee_print_list(c->bee_head_ptr); */
-			}
-		}
+	/* printf("\nAfter current:\n"); */
+	/* for (int i = 0; i < ms; i++) { */
+	/* 	for (int j = 0; j < ms; j++) { */
+	/* 		c = &map->map[i][j]; */
+	/* 		if ( c->bee_head_ptr != NULL) { */
+	/* 			printf("Bees in cell %d, %d:\n", i, j); */
+	/* 			/1* bee_print_list(c->bee_head_ptr); *1/ */
+	/* 		} */
+	/* 	} */
 
-	}
-	printf("\nAfter next:\n");
-	for (int i = 0; i < ms; i++) {
-		for (int j = 0; j < ms; j++) {
-			c = &map->next_map[i][j];
-			if ( c->bee_head_ptr != NULL) {
-				printf("Bees in cell %d, %d:\n", i, j);
-				/* bee_print_list(c->bee_head_ptr); */
-			}
-		}
+	/* } */
+	/* printf("\nAfter next:\n"); */
+	/* for (int i = 0; i < ms; i++) { */
+	/* 	for (int j = 0; j < ms; j++) { */
+	/* 		c = &map->next_map[i][j]; */
+	/* 		if ( c->bee_head_ptr != NULL) { */
+	/* 			printf("Bees in cell %d, %d:\n", i, j); */
+	/* 			/1* bee_print_list(c->bee_head_ptr); *1/ */
+	/* 		} */
+	/* 	} */
 
-	}
+	/* } */
 
 	copy_map_enitites(&map->map[0][0], &map->next_map[0][0], map->map_size);
 	clear_map_cells(&map->next_map[0][0], map->map_size);

@@ -20,9 +20,7 @@ void clear_map_cells(Cell *map, int map_size) {
 			Cell c = {
 				.display_char = ' ', //32 in ascii
 				.bee_head_ptr = NULL,
-				.wasp_head_ptr = NULL,
-				.flower_ptr = NULL,
-				.hive_ptr = NULL
+				.wasp_head_ptr = NULL
 			};
 			
 			*(map + i*MAX_MAP_SIZE + j) = c;
@@ -80,6 +78,8 @@ void free_map(Map *map) {
 	for (int i = 0; i < ms; i++) {
 		for (int j = 0; j < ms; j++) {
 			Cell c = map->map[i][j];
+			/* free(c.flower_ptr); */
+			/* free(c.hive_ptr); */
 			bee_free_linked_list(c.bee_head_ptr);
 			wasp_free_linked_list(c.wasp_head_ptr);
 		}
@@ -92,7 +92,6 @@ void add_hive(Map *m,  Hive h) {
 	printf("Adding hive-> row: %3d, col: %3d, type:%c\n", h.row, h.col, h.type);
 	Cell *c = &m->map[h.row][h.col];
 
-	
 	if (c->display_char != ' ') {
 		printf("Already something here: %c %d\n", c->display_char, c->display_char);
 		printf("ERROR: Cannot place hive at already occupied location (%d, %d)\n", h.row, h.col);
@@ -104,9 +103,22 @@ void add_hive(Map *m,  Hive h) {
 }
 
 
-void add_flower(Map *m,  Flower f) {
+void add_flower(Map *m, Flower f) {
 	printf("Adding flower-> row: %3d, col: %3d, p_type: %d\n", f.row, f.col, f.pollen_type);
 	Cell *c = &m->map[f.row][f.col];
+
+	// The real flower gets deallocated outside of read map, and so becomes gibberish
+	// Allocating memory and storing it like this might work
+	// This works but only as a shallow copy
+	Flower *f_ptr = (Flower *) malloc(sizeof(Flower));
+	f_ptr->pollen_len = f.pollen_len;
+	f_ptr->pollen_type = f.pollen_type;
+	/* f_ptr->pollen = (union Pollen *) malloc(sizeof(union Pollen)); */
+
+	for (int i = 0 ; i < f.pollen_len; i++) {
+		f_ptr->pollen[i] = f.pollen[i];
+	}
+
 
 	if (c->display_char != ' ') {
 		printf("ERROR: Cannot place flower at already occupied location (%d, %d)\n", f.row, f.col);
@@ -114,7 +126,10 @@ void add_flower(Map *m,  Flower f) {
 	}
 
 	c->display_char = 'F';
-	c->flower_ptr = &f;
+	c->flower_ptr = f_ptr;
+
+	int l= c->flower_ptr->pollen_len;
+	/* printf("Pollen count: %d, pollen: %s,...\n", c->flower_ptr->pollen_len, c->flower_ptr->pollen[0].string_info); */
 }
 
 void add_bee(Map *m, Bee b) {
@@ -141,7 +156,7 @@ void add_wasp(Map *m,  Wasp w) {
 	id++;
 }
 
-void add_pollen( Flower *f, union Pollen p) {
+void add_pollen(Flower *f, union Pollen p) {
 	// TODO: consider making pollen a linked list too
 	if (f->pollen_type == 0) 
 		printf("Adding pollen-> info_f: %f\n", p.float_info);
@@ -155,35 +170,6 @@ void add_pollen( Flower *f, union Pollen p) {
 	}
 }
 
-/* void get_pollinators_at_position(int r, int c,  Map *map, union Pollinator *polls[], int poll_len ) { */
-/* 	int count = 0; */
-/* 	for (int i = 0; i < map->hive_len; i++) { */
-/* 		for (int j = 0; j < map->hives[i].pollinator_len; j++) { */
-/* 			union Pollinator *p = &map->hives[i].pollinators[j]; */
-
-/* 			int poll_r; */
-/* 			int poll_c; */
-
-
-/* 			if (map->hives[i].type == 'B' || map->hives[i].type == 'H' || map->hives[i].type == 'D') { */
-/* 				if (p->bee.row == r && p->bee.col == c && count < poll_len) { */
-/* 					polls[count] = p; */
-/* 					count++; */
-/* 				} else if (count >= poll_len) { */
-/* 					printf("ERROR: ran out of space, cant add more pollinators to list from get_pollinators_at_position\n"); */
-/* 				} */
-/* 			} */
-/* 			else if (map->hives[i].type == 'W') { */
-/* 				if (p->wasp.row == r && p->wasp.col == c && count < poll_len) { */
-/* 					polls[count] = p; */
-/* 					count++; */
-/* 				} else if (count >= poll_len) { */
-/* 					printf("ERROR: ran out of space, cant add more pollinators to list from get_pollinators_at_position\n"); */
-/* 				} */
-/* 			} */
-/* 		} */
-/* 	} */
-/* } */
 void read_map(Map *map, Config c) {
 	int current_line = 2;
 	char line[INPUT_LINE_LEN];
@@ -255,6 +241,7 @@ void read_map(Map *map, Config c) {
 				.type=object, 
 			};
 
+			if (n > 0) {
 			char bee_line[BEE_MAX_CHARS];
 			if (fgets(bee_line, BEE_MAX_CHARS, stdin) == NULL) {
 				invalid_object_setup(current_line);
@@ -280,6 +267,7 @@ void read_map(Map *map, Config c) {
 				};
 				add_bee(map, bee);
 			}
+			}
 			add_hive(map, hive);
 		}
 		else if (object == 'W') {
@@ -288,29 +276,31 @@ void read_map(Map *map, Config c) {
 				 .col = x, 
 				 .type= object 
 			 };
-			char wasp_line[BEE_MAX_CHARS];
-			if (fgets(wasp_line, BEE_MAX_CHARS, stdin) == NULL) {
-				invalid_object_setup(current_line);
-			}
+			if (n > 0) {
+				char wasp_line[BEE_MAX_CHARS];
+				if (fgets(wasp_line, BEE_MAX_CHARS, stdin) == NULL) {
+					invalid_object_setup(current_line);
+				}
 
-			current_line++;
+				current_line++;
 
-			char *wasp_tokens[2];
-			split_string(wasp_tokens, 2, wasp_line, " \n");
+				char *wasp_tokens[2];
+				split_string(wasp_tokens, 2, wasp_line, " \n");
 
-			if (!string_to_int(&speed, wasp_tokens[0])) invalid_object_setup(current_line);
+				if (!string_to_int(&speed, wasp_tokens[0])) invalid_object_setup(current_line);
 
-			if (wasp_tokens[1][0] != '\0') invalid_object_setup(current_line);
+				if (wasp_tokens[1][0] != '\0') invalid_object_setup(current_line);
 
 
-			for (int i = 0; i < n; i++) {
-			 	Wasp wasp = { 
-					.row = hive.row, 
-					.col = hive.col, 
-					.speed = speed,
-					.hive_ptr = &hive
-				};
-				add_wasp(map, wasp);
+				for (int i = 0; i < n; i++) {
+					Wasp wasp = { 
+						.row = hive.row, 
+						.col = hive.col, 
+						.speed = speed,
+						.hive_ptr = &hive
+					};
+					add_wasp(map, wasp);
+				}
 			}
 			add_hive(map, hive);
 		}

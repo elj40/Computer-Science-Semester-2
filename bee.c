@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "map.h"
+#include "update.h"
 #include "compass.h"
 #include "bee.h"
 
@@ -18,7 +19,57 @@ void bee_print_list(BeeNode * head) {
 	}
 }
 
-void bee_action(Bee* bee, Map *map) {
+/* - if bee lands on flower and doesnt already have pollen, collect one pollen */ 
+/* - if 2+ bees land on flower: */
+/*     - enough pollen for all: each gets one */
+/*     - not enough: no pollen collected (pollen destroyed?), bees continue as if not on flower */
+/* - if bee lands on wasp hive, it dies */
+/* - if bee lands at same place as wasp, it dies */
+/* - bees that die with pollen destroy pollen */
+/* - if bee lands on flower with wasp: bees die and flower keeps its pollen */
+/* - if 2+ bee scouts inform of a flower at same time, foragers go to closest one */
+void bee_action(Bee * bee, Map *map) {
+	Cell *cell;
+	Cell *next_cell;
+	BeeNode *bee_current_head;
+
+	int or = bee->row;
+	int oc = bee->col;
+	cell = &map->map[or][oc];
+	next_cell = &map->next_map[or][oc];
+
+	printf("Doing bee action: %c %d %d\n", cell->display_char, or, oc );
+
+	if (cell->display_char == 'W') {
+		remove_bee_from_cell(&next_cell->bee_head_ptr, *bee);
+		return;
+	}
+	if (cell->display_char == 'F' && cell->flower_ptr->pollen_len > 0) {
+		Flower *flower_ptr = cell->flower_ptr;
+		printf("I die after this %p\n", flower_ptr);
+
+		int l = flower_ptr->pollen_len;
+		enum PollenType t = flower_ptr->pollen_type;
+		union Pollen p = flower_ptr->pollen[l-1];
+		printf("I die after this\n");
+
+		switch (t) {
+			case FLOAT:
+				bee->pollen.float_info = p.float_info;
+				break;
+			case STRING:
+				bee->pollen.string_info = p.string_info;
+				break;
+		}
+		printf("I die after this\n");
+
+		flower_ptr->pollen_len--;
+		return;
+	}
+	
+}
+
+void bee_land_on_flower(Bee *bee, Cell *c) {
 
 }
 
