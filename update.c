@@ -101,7 +101,7 @@ void map_update( Map *map, Config *config) {
 	}
 	for (int i = 0; i < ms; i++) {
 		for (int j = 0; j < ms; j++) {
-			c = &map->next_map[i][j];
+			c = &map->map[i][j];
 
 			// Reset states of static objects
 			if (c->display_char == 'F') {
