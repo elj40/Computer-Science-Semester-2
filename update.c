@@ -30,6 +30,17 @@ void bee_print_list(BeeNode * head) {
 		current = current->next_ptr;
 	}
 }
+void print_wasp(Wasp w) {
+	printf("Wasp:  r:%d c:%d id:%d\n", w.row, w.col, w.id);
+}
+void wasp_print_list(WaspNode * head) {
+	WaspNode * current = head;
+
+	while (current != NULL) {
+		print_wasp(current->wasp);
+		current = current->next_ptr;
+	}
+}
 void get_next_position_from_trajectory(Trajectory t, int n, int r, int c, int *nr, int *nc) {
 	float dir = t.direction;
 	int s     = t.distance;
@@ -62,6 +73,15 @@ void move_bees_in_cell(Cell *c, Map *m) {
 	}
 }
 
+void move_wasps_in_cell(Cell *c, Map *m) {
+	WaspNode *current = c->wasp_head_ptr;
+	while (current != NULL) {
+		/* printf("Moving wasp %d\n", current->wasp.id); */
+		wasp_move(&current->wasp, m);
+		current = current->next_ptr;
+	}
+}
+
 void map_update( Map *map, Config *config) {
 	int ms = map->map_size;
 	Cell *c;
@@ -71,7 +91,7 @@ void map_update( Map *map, Config *config) {
 			c = &map->map[i][j];
 			if ( c->bee_head_ptr != NULL) {
 				printf("Bees in cell %d, %d:\n", i, j);
-				bee_print_list(c->bee_head_ptr);
+				/* bee_print_list(c->bee_head_ptr); */
 			}
 		}
 
@@ -81,6 +101,7 @@ void map_update( Map *map, Config *config) {
 			c = &map->map[i][j];
 
 			move_bees_in_cell(c, map);
+			move_wasps_in_cell(c, map);
 
 			/* action_bees_in_cell(*c); */
 			/* move_wasps_in_cell(*c); */
@@ -94,7 +115,7 @@ void map_update( Map *map, Config *config) {
 			c = &map->map[i][j];
 			if ( c->bee_head_ptr != NULL) {
 				printf("Bees in cell %d, %d:\n", i, j);
-				bee_print_list(c->bee_head_ptr);
+				/* bee_print_list(c->bee_head_ptr); */
 			}
 		}
 
@@ -105,7 +126,7 @@ void map_update( Map *map, Config *config) {
 			c = &map->next_map[i][j];
 			if ( c->bee_head_ptr != NULL) {
 				printf("Bees in cell %d, %d:\n", i, j);
-				bee_print_list(c->bee_head_ptr);
+				/* bee_print_list(c->bee_head_ptr); */
 			}
 		}
 
@@ -113,32 +134,7 @@ void map_update( Map *map, Config *config) {
 
 	copy_map_enitites(&map->map[0][0], &map->next_map[0][0], map->map_size);
 	clear_map_cells(&map->next_map[0][0], map->map_size);
-	/* 	for (int i = 0; i < map->hive_len; i++) { */
-	/* 		hive_update(&map->hives[i], map, config); */
-	/* 	} */
 }
-
-/* void hive_update( Hive *hive,  Map *map, Config *config) { */
-/* 	for (int i = 0; i < hive->pollinator_len; i++) { */
-/* 		switch (hive->type) { */
-/* 			case 'W': */
-/* 				wasp_move(&hive->pollinators[i].wasp, map); */
-/* 				break; */
-/* 			case 'H': */
-/* 			case 'B': */
-/* 			case 'D': */
-/* 				bee_move(&hive->pollinators[i].bee, map); */
-/* 				/1* bee_action(&hive->pollinators[i].bee, map); *1/ */
-/* 				break; */
-/* 			default: */
-/* 				printf("Unknown hive type in update"); */
-/* 				break; */
-/* 		} */
-/* 	} */
-/* } */
-/* /1* All types of bees have a perception range at which they can “see” flowers. If any bee except the scout bee sees a flower within its perception range that contains pollen, it will move in a direction towards the flower on the next turn(s) (as long as it is not carrying an item), with the magnitude given by the trajectory. In contrast, if a scout bee sees a flower within its perception range that contains pollen, it will immediately fly back to its hive to inform the foragers. If there are multiple flowers in the range of the bee, the bee will always go towards the flower that is closest (i.e. within less perception range), and is the bottom-most and left-most within that proximity. *1/ */ 
-
-/* /1* When entities know the location of their destination and can fly towards the destination, they first move diagonally in the direction of the destination until they can move in a straight line towards the destination. The distance they move is always determined by their compass. *1/ */
 
 /* // TODO: do the random distribution with speed thingy */
 Trajectory get_trajectory_from_target(int r, int c,int speed, int tr, int tc) {
@@ -203,7 +199,7 @@ void bee_check_for_flowers( Bee *bee,  Map *m, int *fr, int *fc) {
 	}
 }
 
- Trajectory bee_get_next_trajectory( Bee *bee,  Map *map) {
+Trajectory bee_get_next_trajectory( Bee *bee,  Map *map) {
 	int flower_r, flower_c;
 	bee_check_for_flowers(bee, map, &flower_r, &flower_c);
 
@@ -229,6 +225,9 @@ void bee_check_for_flowers( Bee *bee,  Map *m, int *fr, int *fc) {
 	printf("Somehow bee does not have correct state, returning random direction\n");
 	return get_random_trajectory(bee->speed);
 }
+Trajectory wasp_get_next_trajectory( Wasp *wasp,  Map *map) {
+	return get_random_trajectory(wasp->speed);
+}
 
 void remove_bee_from_cell(BeeNode **head, Bee bee) {
 	BeeNode *current = *head;
@@ -237,6 +236,26 @@ void remove_bee_from_cell(BeeNode **head, Bee bee) {
 	while (current != NULL) {
 		if (current->bee.id == bee.id) {
 			/* printf("Removing bee %d\n", bee.id); */
+			if (previous == NULL) { // We are at start
+				*head = current->next_ptr;
+			} else {
+				previous->next_ptr = current->next_ptr;
+			}
+			/* free(current); */
+			return;
+		}
+		previous = current;
+		current = current->next_ptr;
+	}
+}
+
+void remove_wasp_from_cell(WaspNode **head, Wasp wasp) {
+	WaspNode *current = *head;
+	WaspNode *previous = NULL;
+
+	while (current != NULL) {
+		if (current->wasp.id == wasp.id) {
+			/* printf("Removing wasp %d\n", wasp.id); */
 			if (previous == NULL) { // We are at start
 				*head = current->next_ptr;
 			} else {
@@ -270,6 +289,25 @@ void add_bee_to_cell(BeeNode **head, Bee bee) {
 	current_bee_node->next_ptr = new_node;
 }
 
+void add_wasp_to_cell(WaspNode **head, Wasp wasp) {
+	/* printf("Adding wasp %d\n", wasp.id); */
+	WaspNode *new_node = (WaspNode *) malloc(sizeof(WaspNode));
+	new_node->wasp = wasp;
+	new_node->next_ptr = NULL;
+
+	/* print_wasp(wasp); */
+
+	if (*head == NULL) {
+		*head = new_node;
+		return;
+	}
+
+	WaspNode *current_wasp_node = *head;
+	while (current_wasp_node->next_ptr != NULL) {
+		current_wasp_node = current_wasp_node->next_ptr;
+	}
+	current_wasp_node->next_ptr = new_node;
+}
 
 void bee_move( Bee *bee,  Map *map) {
 	Trajectory t = bee_get_next_trajectory(bee, map);
@@ -282,25 +320,35 @@ void bee_move( Bee *bee,  Map *map) {
 
 	get_next_position_from_trajectory(t, map->map_size-1, or, oc, &nr, &nc);
 
-	/* printf("Bee moved from %d,%d to %d,%d\n", or, oc, nr, nc); */
 	bee->row = nr;
 	bee->col = nc;
 
 	cell = &map->next_map[nr][nc];
 	cell_head = &cell->bee_head_ptr;
 	add_bee_to_cell(cell_head, *bee);
-
-	/* printf("Bees at next cell\n"); */
-	/* bee_print_list(*cell_head); */
-
-	/* cell = &map->next_map[or][oc]; */
-	/* cell_head = &cell->bee_head_ptr; */
-	/* remove_bee_from_cell(cell_head, *bee); */ 
-
-
 }
 
 
+void wasp_move(Wasp *wasp,  Map *map) {
+	Trajectory t = wasp_get_next_trajectory(wasp, map);
+	Cell *cell;
+	WaspNode **cell_head;
+
+	int or = wasp->row;
+	int oc = wasp->col;
+	int nr, nc;
+
+	get_next_position_from_trajectory(t, map->map_size-1, or, oc, &nr, &nc);
+
+	/* printf("Bee moved from %d,%d to %d,%d\n", or, oc, nr, nc); */
+	wasp->row = nr;
+	wasp->col = nc;
+
+	cell = &map->next_map[nr][nc];
+	cell_head = &cell->wasp_head_ptr;
+	add_wasp_to_cell(cell_head, *wasp);
+
+}
 /* void wasp_move( Wasp *wasp,  Map *map) { */
 /* 	Trajectory t = get_random_trajectory(wasp->speed); */
 

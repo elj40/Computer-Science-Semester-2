@@ -50,22 +50,34 @@ int bee_linked_list_len(BeeNode *head) {
 	}
 	return count;
 }
+int wasp_linked_list_len(WaspNode *head) {
+	int count = 0;
+
+	WaspNode *current = head;
+	while (current != NULL) {
+		count++;
+		current = current->next_ptr;
+	}
+	return count;
+}
 char get_display_char(Cell c) {
 	if (c.display_char != ' ') return c.display_char;
 
 	int count = 0;
 	// Count bees
 	int bee_count = bee_linked_list_len(c.bee_head_ptr);
+	int wasp_count = wasp_linked_list_len(c.wasp_head_ptr);
 
 	// Count wasps
 	/* int wasp_count += bee_linked_list_len(c.wasp_head_ptr); */
 
 	count += bee_count;
+	count += wasp_count;
 	/* printf("Found %d bees\n", count); */
 
 	if (count > 1) return 'm';
 	else if (bee_count == 1) return 'b'; //TODO: make more general
-	/* else if (wasp_count == 1) return 'w'; */
+	else if (wasp_count == 1) return 'w';
 
 	return ' ';
 }

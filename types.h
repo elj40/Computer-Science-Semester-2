@@ -48,17 +48,24 @@ typedef struct Bee {
 	enum BeeType type;
 } Bee;
 
-typedef struct BeeNode {
-	Bee bee;
-	struct BeeNode *next_ptr;
-} BeeNode;
 
 typedef struct {
+	int id;
 	int row;
 	int col;
 	int speed;
 	Hive *hive_ptr;
 } Wasp;
+
+typedef struct BeeNode {
+	Bee bee;
+	struct BeeNode *next_ptr;
+} BeeNode;
+
+typedef struct WaspNode {
+	Wasp wasp;
+	struct WaspNode *next_ptr;
+} WaspNode;
 
 union Pollinator {
 	Bee bee;

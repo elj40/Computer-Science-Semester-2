@@ -8,7 +8,7 @@ typedef struct {
 	Flower *flower_ptr;
 	Hive *hive_ptr;
 	BeeNode *bee_head_ptr;
-	Wasp *wasp_head_ptr;
+	WaspNode *wasp_head_ptr;
 } Cell;
 
 typedef struct {

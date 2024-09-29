@@ -140,10 +140,14 @@ void add_bee(Map *m, Bee b) {
 
 
 void add_wasp(Map *m,  Wasp w) {
+	static int id = 0;
 	printf("Adding wasp-> row: %3d, col: %3d, speed: %3d\n", w.row, w.col, w.speed);
 	Cell *c = &m->map[w.row][w.col];
 
-	/* wasp_append_to_linked_list(c->wasp_head_ptr, &w); */
+	w.id = id;
+	add_wasp_to_cell(&c->wasp_head_ptr, w);
+
+	id++;
 }
 
 void add_pollen( Flower *f, union Pollen p) {

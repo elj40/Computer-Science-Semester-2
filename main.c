@@ -21,11 +21,6 @@ int main(int argc, char* argv[]) {
 	char config_line[CONFIG_LINE_LEN];
 	if (fgets(config_line, CONFIG_LINE_LEN, stdin) == NULL)
 		return 0;
-
-	int map_size, duration; 
-	enum PollenType pollen_type;
-	enum BeehiveAction beehive_action;
-
 	Map map;
 	Config config;
 
