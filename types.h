@@ -7,6 +7,11 @@
 #define MAX_HIVE_POLLINATORS 200
 #define MAX_POLLEN_LEN 100
 
+#define MAX(x, y) (((x) > (y)) ? (x) : (y))
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+
+#define EPS 0.01
+
 enum PollenType { FLOAT, STRING };
 enum BeehiveAction { MAX, MIN, SUM, SORT };
 enum BeeRole { FORAGER, SCOUT };
