@@ -97,31 +97,54 @@ void bee_action(Bee * bee, Map *map) {
 	else if (bee->type == HONEY) printf("I am a honey bee\n");
 }
 
+void hive_add_pollen(Hive *hive, union Pollen pollen) {
+	int l = hive->pollen_len;
+	if (hive->pollen_len >= MAX_FLOWER_POLLEN) {
+		printf("ERROR: could not add latest pollen to hive, overflow\n");
+	}
+	if (hive->pollen_type == FLOAT) hive->pollen[l] = pollen;
+	else if (hive->pollen_type == STRING) 
+		strncpy(hive->pollen[l].string_info, pollen.string_info, MAX_POLLEN_CHARS);
+
+	hive->pollen_len++;
+}
+
 void normal_bee_action(Bee *bee, Map *map) {
 	// This behaviour is specific to general bee
 	bool flower_close = bee_check_for_flowers(bee, map);
-	if (bee->state == RETURN) return;
+	if (bee->state == RETURN) {
+		if (bee->row == bee->hive_ptr->row && bee->col == bee->hive_ptr->col) {
+			// Add pollen to hive
+			hive_add_pollen(bee->hive_ptr, bee->pollen);
+			bee->state = WANDER;
+		}
+		return;
+	}
 	if (flower_close) bee->state = SEEK;
 	else bee->state = WANDER;
 }
 
-void honey_bee_action(Bee *bee, Map *map) {
-/* - Honey: */
-/* 	- Two roles: scouts of forager */
-/* 	- Scout: */ 
-/* 		- double perception */
-/* 		- 2 states: wander and return*/
-/*         - Stores location */
-/*     - Forager: */ 
-/*         - dormant until hearing about location */
-/*         - 3 states: dormant (stay at hive), go to target, search (look around empty flower for 5 moves or pollen) */
-/*         - Stores location and pollen */
-	 if (bee->role == SCOUT) {
+
+void honey_bee_action(Bee *bee, Map *map, Config config) {
+	/* - Honey: */
+	/* 	- Two roles: scouts of forager */
+	/* 	- Scout: */ 
+	/* 		- double perception */
+	/* 		- 2 states: wander and return*/
+	/*         - Stores location */
+	/*     - Forager: */ 
+	/*         - dormant until hearing about location */
+	/*         - 3 states: dormant (stay at hive), go to target, search (look around empty flower for 5 moves or pollen) */
+	/*         - Stores location and pollen */
+
+
+	int r = bee->row;
+	int c = bee->col;
+	Cell cell = map->map[r][c];
+	if (bee->role == SCOUT) {
 		if (bee->state == RETURN) {
-			int r = bee->row;
-			int c = bee->col;
-			if (map->map[r][c].display_char == 'H') {
-				/* wake_up_honey_bees_in_cell(r, c); */
+			if (bee->row == bee->hive_ptr->row && bee->col == bee->hive_ptr->col) {
+				wake_up_honey_bees_in_cell(&cell, bee->flower_location.row, bee->flower_location.col);
 				bee->state = WANDER;
 				return;
 			}
@@ -135,12 +158,16 @@ void honey_bee_action(Bee *bee, Map *map) {
 			return;
 		}
 		else bee->state = WANDER;
-	 }
+	}
 
-	 if (bee->role == FORAGER) {
-		if (bee->state == RETURN || bee->state == DORMANT) return;
-		
-	 }
+	if (bee->role == FORAGER) {
+		if (bee->state == RETURN) {
+			if (r == bee->hive_ptr->row && c == bee->hive_ptr->col) {
+				hive_add_pollen(bee->hive_ptr, bee->pollen);
+				bee->state = DORMANT;
+			}
+		}
+	}
 }
 
 void bee_land_on_flower(Bee *bee, Cell *cell) {
@@ -155,7 +182,6 @@ void bee_land_on_flower(Bee *bee, Cell *cell) {
 			bee->pollen.float_info = p.float_info;
 			break;
 		case STRING:
-			/* bee->pollen.string_info = p.string_info; */
 			strncpy(bee->pollen.string_info, p.string_info, MAX_POLLEN_CHARS);
 			break;
 	}
@@ -204,7 +230,7 @@ void add_bee_to_cell(BeeNode **head, Bee bee) {
 	current_bee_node->next_ptr = new_node;
 }
 
-Trajectory bee_get_next_trajectory(Bee *bee,  Map *map) {
+Trajectory normal_bee_get_next_trajectory(Bee *bee, Map *map) {
 	int flower_r, flower_c;
 	int hive_r, hive_c;
 
@@ -228,6 +254,17 @@ Trajectory bee_get_next_trajectory(Bee *bee,  Map *map) {
 	printf("Somehow bee does not have correct state, returning random direction\n");
 	return get_random_trajectory(bee->speed);
 }
+/* void honey_bee_get_next_trajectory(bee, map); */
+
+Trajectory bee_get_next_trajectory(Bee *bee,  Map *map) {
+	if (bee->type == NORMAL) {
+		return normal_bee_get_next_trajectory(bee, map);
+	}
+	/* else if (bee->type == HONEY) { */
+	/* 	return honey_bee_get_next_trajectory(bee, map); */
+	/* } */
+}
+
 
 bool bee_check_for_flowers(Bee *bee, Map *m) {
 	/* If therr are any flowers, return true most bottom left one

@@ -25,4 +25,6 @@ void read_map( Map *map, Config c);
 void add_pollen( Flower *f, union Pollen p);
 void bee_free_linked_list(BeeNode *head);
 
+void wake_up_honey_bees_in_cell(Cell *c, int fr, int fc);
+
 #endif

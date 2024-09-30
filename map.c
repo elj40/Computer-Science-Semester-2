@@ -87,6 +87,17 @@ void free_map(Map *map) {
 	}
 }
 
+void wake_up_honey_bees_in_cell(Cell *c, int fr, int fc) {
+	BeeNode * current = c->bee_head_ptr;
+	while (current) {
+		if (current->bee.type == HONEY) {
+			current->bee.flower_location.row = fr;
+			current->bee.flower_location.col = fc;
+			current->bee.state = SEEK;
+		}
+		current = current->next_ptr;
+	}
+}
 
 void add_hive(Map *m,  Hive h) {
 	printf("Adding hive-> row: %3d, col: %3d, type:%c\n", h.row, h.col, h.type);
@@ -244,6 +255,7 @@ void read_map(Map *map, Config c) {
 				.row = y,
 				.col = x, 
 				.type=object, 
+				.pollen_type = c.pollen_type
 			};
 			add_hive(map, hive);
 

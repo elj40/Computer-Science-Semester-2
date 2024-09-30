@@ -7,7 +7,6 @@
 #define MAX_MAP_SIZE 100
 #define MAX_FLOWER_POLLEN 100
 #define MAX_BEE_POLLEN 200
-#define MAX_HIVE_POLLINATORS 200
 #define MAX_POLLEN_LEN 100
 #define MAX_POLLEN_CHARS 50
 
@@ -38,6 +37,9 @@ typedef struct {
 	int row;
 	int col;
 	char type;
+	int pollen_len;
+	enum PollenType pollen_type;
+	union Pollen pollen[MAX_FLOWER_POLLEN];
 } Hive;
 
 typedef struct Bee {
