@@ -10,9 +10,10 @@
 #include "compass.h"
 #include "bee.h"
 
+void honey_bee_action(Bee *bee, Map *map);
 void bee_land_on_flower(Bee *bee, Cell *cell);
 void print_bee(Bee b) {
-	printf("Bee:\tr:%d c:%d id:%d type:%d state:%d\n", b.row, b.col, b.id, b.type, b.state);
+	printf("Bee:\tr:%d c:%d p:%d id:%d type:%d state:%d\n", b.row, b.col, b.perception, b.id, b.type, b.state);
 }
 void bee_print_list(BeeNode * head) {
 	BeeNode * current = head;
@@ -90,14 +91,12 @@ void bee_action(Bee * bee, Map *map) {
 	}
 	
 	//Usual behaviour
-	
-	printf("Bee type: %d\n", bee->type);
-
 	if (bee->type == NORMAL) normal_bee_action(bee, map);
-	else if (bee->type == HONEY) printf("I am a honey bee\n");
+	else if (bee->type == HONEY) honey_bee_action(bee, map);
 }
 
 void hive_add_pollen(Hive *hive, union Pollen pollen) {
+	printf("Adding pollen to hive\n");
 	int l = hive->pollen_len;
 	if (hive->pollen_len >= MAX_FLOWER_POLLEN) {
 		printf("ERROR: could not add latest pollen to hive, overflow\n");
@@ -125,7 +124,7 @@ void normal_bee_action(Bee *bee, Map *map) {
 }
 
 
-void honey_bee_action(Bee *bee, Map *map, Config config) {
+void honey_bee_action(Bee *bee, Map *map) {
 	/* - Honey: */
 	/* 	- Two roles: scouts of forager */
 	/* 	- Scout: */ 
@@ -144,6 +143,7 @@ void honey_bee_action(Bee *bee, Map *map, Config config) {
 	if (bee->role == SCOUT) {
 		if (bee->state == RETURN) {
 			if (bee->row == bee->hive_ptr->row && bee->col == bee->hive_ptr->col) {
+				printf("Scout %d reported flower\n", bee->id);
 				wake_up_honey_bees_in_cell(&cell, bee->flower_location.row, bee->flower_location.col);
 				bee->state = WANDER;
 				return;
@@ -151,6 +151,7 @@ void honey_bee_action(Bee *bee, Map *map, Config config) {
 		}
 		bool flower_close = bee_check_for_flowers(bee, map);
 		if (flower_close) {
+			printf("Scout %d spotted a flower\n", bee->id);
 			int *fr = &bee->flower_location.row;
 			int *fc = &bee->flower_location.col;
 			bee_locate_flowers(bee, map, fr, fc);
@@ -164,6 +165,8 @@ void honey_bee_action(Bee *bee, Map *map, Config config) {
 		if (bee->state == RETURN) {
 			if (r == bee->hive_ptr->row && c == bee->hive_ptr->col) {
 				hive_add_pollen(bee->hive_ptr, bee->pollen);
+				bee->flower_location.row = MAX_MAP_SIZE+1;
+				bee->flower_location.col = MAX_MAP_SIZE+1;
 				bee->state = DORMANT;
 			}
 		}
@@ -171,6 +174,7 @@ void honey_bee_action(Bee *bee, Map *map, Config config) {
 }
 
 void bee_land_on_flower(Bee *bee, Cell *cell) {
+	printf("Bee on flower!\n");
 	Flower *flower_ptr = cell->flower_ptr;
 
 	int l = flower_ptr->pollen_len;
@@ -254,15 +258,35 @@ Trajectory normal_bee_get_next_trajectory(Bee *bee, Map *map) {
 	printf("Somehow bee does not have correct state, returning random direction\n");
 	return get_random_trajectory(bee->speed);
 }
-/* void honey_bee_get_next_trajectory(bee, map); */
+
+Trajectory honey_bee_get_next_trajectory(Bee *bee, Map *map) {
+	if (bee->state == WANDER) return get_random_trajectory(bee->speed);
+	if (bee->state == RETURN) {
+		int hive_r = bee->hive_ptr->row;
+		int hive_c = bee->hive_ptr->col;
+
+		return get_trajectory_from_target(bee->row, bee->col, bee->speed, hive_r, hive_c);
+	}
+	if (bee->role == FORAGER) {
+		if (bee->state == DORMANT) {
+			Trajectory zero_traj = { .distance = 0 };
+			return zero_traj;
+		}
+		if (bee->state == SEEK) {
+			int fr = bee->flower_location.row;
+			int fc = bee->flower_location.col;
+			return get_trajectory_from_target(bee->row, bee->col, bee->speed, fr, fc);
+		}
+	}
+}
 
 Trajectory bee_get_next_trajectory(Bee *bee,  Map *map) {
 	if (bee->type == NORMAL) {
 		return normal_bee_get_next_trajectory(bee, map);
 	}
-	/* else if (bee->type == HONEY) { */
-	/* 	return honey_bee_get_next_trajectory(bee, map); */
-	/* } */
+	else if (bee->type == HONEY) {
+		return honey_bee_get_next_trajectory(bee, map);
+	}
 }
 
 

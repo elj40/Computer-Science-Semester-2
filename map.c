@@ -90,7 +90,7 @@ void free_map(Map *map) {
 void wake_up_honey_bees_in_cell(Cell *c, int fr, int fc) {
 	BeeNode * current = c->bee_head_ptr;
 	while (current) {
-		if (current->bee.type == HONEY) {
+		if (current->bee.type == HONEY && current->bee.role == FORAGER) {
 			current->bee.flower_location.row = fr;
 			current->bee.flower_location.col = fc;
 			current->bee.state = SEEK;
@@ -295,6 +295,9 @@ void read_map(Map *map, Config c) {
 						bee.type = DESERT;
 						break;
 				}
+
+				if (bee.role == SCOUT) bee.perception *= 2;
+				if (bee.role == FORAGER && bee.type == HONEY) bee.state = DORMANT;
 				add_bee(map, bee);
 			}
 			}
