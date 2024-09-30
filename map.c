@@ -132,7 +132,8 @@ void add_flower(Map *m, Flower f) {
 
 void add_bee(Map *m, Bee b) {
 	static int id = 0;
-	printf("Adding bee-> row: %3d, col: %3d, speed: %3d, percep: %3d, id:%3d\n", b.row, b.col, b.speed, b.perception, id);
+	printf("Adding bee-> row: %3d, col: %3d, speed: %3d, percep: %3d, id:%3d, type: %d, role: %d\n", 
+		b.row, b.col, b.speed, b.perception, id, b.type, b.role);
 	Cell *c = &m->map[b.row][b.col];
 	/* c->bee_head_ptr = NULL; */
 
@@ -268,8 +269,20 @@ void read_map(Map *map, Config c) {
 					.speed = speed,
 					.perception = perception,
 					.state = WANDER,
-					.hive_ptr = &hive
+					.role = FORAGER,
 				};
+				switch (object) {
+					case 'B':
+						bee.type = NORMAL;
+						break;
+					case 'H':
+						bee.type = HONEY;
+						bee.role = rand() % 2;
+						break;
+					case 'D':
+						bee.type = DESERT;
+						break;
+				}
 				add_bee(map, bee);
 			}
 			}

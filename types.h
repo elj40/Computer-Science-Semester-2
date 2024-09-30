@@ -2,6 +2,8 @@
 #define TYPES_H
 
 #include <stdbool.h>
+
+#include "point.h"
 #define MAX_MAP_SIZE 100
 #define MAX_FLOWER_POLLEN 100
 #define MAX_BEE_POLLEN 200
@@ -18,7 +20,7 @@ enum PollenType { FLOAT, STRING };
 enum BeehiveAction { MAX, MIN, SUM, SORT };
 enum BeeRole { FORAGER, SCOUT };
 enum BeeType { NORMAL, HONEY, DESERT };
-enum PollinatorState { WANDER, RETURN, SEEK };
+enum PollinatorState { WANDER, RETURN, SEEK, DORMANT };
 
 
 union Pollen {
@@ -44,6 +46,7 @@ typedef struct Bee {
 	int col;
 	int speed;
 	int perception;
+	Point flower_location;
 	Hive *hive_ptr;
 	union Pollen pollen;
 	enum BeeRole role;	

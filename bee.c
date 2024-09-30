@@ -12,7 +12,7 @@
 
 void bee_land_on_flower(Bee *bee, Cell *cell);
 void print_bee(Bee b) {
-	printf("Bee:\tr:%d c:%d id:%d state:%d\n", b.row, b.col, b.id, b.state);
+	printf("Bee:\tr:%d c:%d id:%d type:%d state:%d\n", b.row, b.col, b.id, b.type, b.state);
 }
 void bee_print_list(BeeNode * head) {
 	BeeNode * current = head;
@@ -46,20 +46,30 @@ void bee_action(Bee * bee, Map *map) {
 
 	/* printf("Doing bee action: %c %d %d\n", cell->display_char, r, c ); */
 
-	//Special behviours
+	//Special behaviours
 
+	// Dying on wasp hive is the same for all bees
 	if (cell->display_char == 'W') {
 		remove_bee_from_cell(&next_cell->bee_head_ptr, *bee);
 		return;
 	}
+
+	// This behaviour is general, except for desert bee, who now needs to remember the path
+	// and scout bee, who will only be here if it has perception of 0, who must leave without pollen;
 	if (cell->display_char == 'F' 
 		&& cell->flower_ptr->pollen_len > 0 
 		&& (bee->state == SEEK || bee->state == WANDER)) 
 	{
 
+		if (bee->role == SCOUT) {
+			bee->flower_location.row = bee->row;
+			bee->flower_location.col = bee->col;
+			bee->state = RETURN;
+			return;
+		}
+
 		int this_bee_pos = bee_linked_list_get_node_pos(cell->bee_head_ptr, *bee);
 		total_bees_count = bee_linked_list_len(cell->bee_head_ptr);
-
 
 		pollen_len = cell->flower_ptr->pollen_len;
 
@@ -80,11 +90,57 @@ void bee_action(Bee * bee, Map *map) {
 	}
 	
 	//Usual behaviour
+	
+	printf("Bee type: %d\n", bee->type);
+
+	if (bee->type == NORMAL) normal_bee_action(bee, map);
+	else if (bee->type == HONEY) printf("I am a honey bee\n");
+}
+
+void normal_bee_action(Bee *bee, Map *map) {
+	// This behaviour is specific to general bee
 	bool flower_close = bee_check_for_flowers(bee, map);
-	/* printf("Flower close? %d\n", flower_close); */
 	if (bee->state == RETURN) return;
 	if (flower_close) bee->state = SEEK;
 	else bee->state = WANDER;
+}
+
+void honey_bee_action(Bee *bee, Map *map) {
+/* - Honey: */
+/* 	- Two roles: scouts of forager */
+/* 	- Scout: */ 
+/* 		- double perception */
+/* 		- 2 states: wander and return*/
+/*         - Stores location */
+/*     - Forager: */ 
+/*         - dormant until hearing about location */
+/*         - 3 states: dormant (stay at hive), go to target, search (look around empty flower for 5 moves or pollen) */
+/*         - Stores location and pollen */
+	 if (bee->role == SCOUT) {
+		if (bee->state == RETURN) {
+			int r = bee->row;
+			int c = bee->col;
+			if (map->map[r][c].display_char == 'H') {
+				/* wake_up_honey_bees_in_cell(r, c); */
+				bee->state = WANDER;
+				return;
+			}
+		}
+		bool flower_close = bee_check_for_flowers(bee, map);
+		if (flower_close) {
+			int *fr = &bee->flower_location.row;
+			int *fc = &bee->flower_location.col;
+			bee_locate_flowers(bee, map, fr, fc);
+			bee->state = RETURN;
+			return;
+		}
+		else bee->state = WANDER;
+	 }
+
+	 if (bee->role == FORAGER) {
+		if (bee->state == RETURN || bee->state == DORMANT) return;
+		
+	 }
 }
 
 void bee_land_on_flower(Bee *bee, Cell *cell) {
