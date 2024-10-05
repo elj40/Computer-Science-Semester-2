@@ -152,7 +152,10 @@ void add_bee(Map *m, Bee b) {
 		printf("ERROR: no hive found at %d %d, make sure to place a hive before adding bees there\n");
 		exit(1);
 	}
+
+	// Default stuff for bee that dont depend on input file
 	b.id = id;
+	b.flower_path_index = 0;
 	b.hive_ptr = c->hive_ptr;
 	add_bee_to_cell(&c->bee_head_ptr, b);
 	/* bee_print_list(c->bee_head_ptr); */
