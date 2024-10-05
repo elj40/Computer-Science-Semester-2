@@ -24,6 +24,12 @@ void bee_print_list(BeeNode * head) {
 	}
 }
 
+void bee_free_flower_path(Trajectory ** flower_path, int len) {
+	for (int i = 0; i < len; i++) {
+		free(flower_path[i]);
+	}
+	free(flower_path);
+}
 /* - if bee lands on flower and doesnt already have pollen, collect one pollen */ 
 /* - if 2+ bees land on flower: */
 /*     - enough pollen for all: each gets one */
