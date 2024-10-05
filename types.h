@@ -48,8 +48,14 @@ typedef struct Bee {
 	int col;
 	int speed;
 	int perception;
+
 	Point flower_location;
+	Trajectory * flower_path;
+	int flower_path_len;
+	int flower_path_index;
+
 	Hive *hive_ptr;
+
 	union Pollen pollen;
 	enum BeeRole role;	
 	enum PollinatorState state;
