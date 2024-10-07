@@ -55,7 +55,7 @@ void bee_action(Bee * bee, Map *map) {
 	// and scout bee, who will only be here if it has perception of 0, who must leave without pollen;
 	if (cell->display_char == 'F' 
 		&& cell->flower_ptr->pollen_len > 0 
-		&& (bee->state == SEEK || bee->state == WANDER)) 
+		&& (bee->state == SEEK || bee->state == WANDER || bee->state == PATH)) 
 	{
 
 		if (bee->role == SCOUT) {
@@ -95,7 +95,6 @@ void bee_action(Bee * bee, Map *map) {
 		return;
 	}
 	
-	//Usual behaviour
 	if (bee->type == NORMAL) normal_bee_action(bee, map);
 	else if (bee->type == HONEY) honey_bee_action(bee, map);
 }
@@ -186,6 +185,9 @@ void honey_bee_action(Bee *bee, Map *map) {
 }
 
 void desert_bee_action(Bee *bee, Map *map) {
+	if (bee->state == WANDER) {}
+	if (bee->state == SEEK) {}
+	if (bee->state == PATH) {}
 	if (bee->state == RETURN) {
 		if (bee->row == bee->hive_ptr->row && bee->col == bee->hive_ptr->col) {
 			// Add pollen to hive
@@ -309,6 +311,41 @@ Trajectory honey_bee_get_next_trajectory(Bee *bee, Map *map) {
 	}
 }
 
+
+Trajectory desert_bee_get_next_trajectory(Bee *bee, Map *map) {
+	int flower_r, flower_c;
+	if (bee->state == WANDER) {
+		//add to path array
+		// increment path length
+		// make sure path index is still -1
+		Trajectory rand_traj = get_random_trajectory(bee->speed);
+		bee->flower_path[bee->flower_path_len] = rand_traj;
+		bee->flower_path_len++;
+		bee->flower_path_index = -1;
+
+		return rand_traj;
+	}
+	else if (bee->state == RETURN) {
+		int hive_r = bee->hive_ptr->row;
+		int hive_c = bee->hive_ptr->col;
+
+		return get_trajectory_from_target(bee->row, bee->col, bee->speed, hive_r, hive_c);
+	}
+	else if (bee->state == SEEK) {
+		bee_locate_flowers(bee, map, &flower_r, &flower_c);
+		return get_trajectory_from_target(bee->row, bee->col, bee->speed,flower_r, flower_c);
+	}
+	else if (bee->state == PATH) {
+		bee->flower_path_index++;
+		int i = bee->flower_path_index;
+		if (i <= -1 || i >= bee->flower_path_len) {
+			printf("-------->WE SHOULD NOT HAVE THIS INDEX!!! %d\n", i);
+		}
+		Trajectory t = bee->flower_path[i];
+		return t;
+	}
+	
+}
 Trajectory bee_get_next_trajectory(Bee *bee,  Map *map) {
 	if (bee->type == NORMAL) {
 		return normal_bee_get_next_trajectory(bee, map);
