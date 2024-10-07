@@ -279,6 +279,7 @@ void read_map(Map *map, Config c) {
 			if (!string_to_int(&perception, bee_tokens[1])) invalid_object_setup(current_line);
 			if (bee_tokens[2][0] != '\0') invalid_object_setup(current_line);
 
+			// TODO: make constructor functions for all the structs
 			for (int i = 0; i < n; i++) {
 				Bee bee = {
 					.row = hive.row,
@@ -298,6 +299,7 @@ void read_map(Map *map, Config c) {
 						break;
 					case 'D':
 						bee.type = DESERT;
+						bee.flower_path_index = -1;
 						break;
 				}
 
