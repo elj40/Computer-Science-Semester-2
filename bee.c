@@ -10,6 +10,8 @@
 #include "compass.h"
 #include "bee.h"
 
+#define HONEY_BEE_SEARCH_MOVES 5
+
 void honey_bee_action(Bee *bee, Map *map);
 void desert_bee_action(Bee *bee, Map *map);
 void bee_land_on_flower(Bee *bee, Cell *cell);
@@ -144,7 +146,9 @@ void honey_bee_action(Bee *bee, Map *map) {
 		if (bee->state == RETURN) {
 			if (bee->row == bee->hive_ptr->row && bee->col == bee->hive_ptr->col) {
 				printf("Scout %d reported flower\n", bee->id);
-				wake_up_honey_bees_in_cell(&cell, bee->flower_location.row, bee->flower_location.col);
+				wake_up_honey_bees_in_cell(&cell,
+						bee->flower_location.row,
+						bee->flower_location.col);
 				bee->state = WANDER;
 				return;
 			}
@@ -163,7 +167,8 @@ void honey_bee_action(Bee *bee, Map *map) {
 
 	if (bee->role == FORAGER) {
 		if (bee->state == RETURN) {
-			if (r == bee->hive_ptr->row && c == bee->hive_ptr->col) {
+			if (r == bee->hive_ptr->row && c == bee->hive_ptr->col)
+			{
 
 				bool has_pollen = bee->pollen.string_info[0] != '\0';
 				bee->pollen.string_info[0] != '\0';
@@ -172,6 +177,24 @@ void honey_bee_action(Bee *bee, Map *map) {
 				bee->flower_location.row = MAX_MAP_SIZE+1;
 				bee->flower_location.col = MAX_MAP_SIZE+1;
 				bee->state = DORMANT;
+			}
+		}
+		else if (bee->state == PATH) {
+			// We can use this extra state to cover the searching for five moves
+			// after encountering an empty flower
+
+			bee->flower_path_len++;
+			if (bee->flower_path_len >= HONEY_BEE_SEARCH_MOVES ) {
+				bee->flower_path_index = -1;
+				bee->state = RETURN;
+				return;
+			}
+			bool flower_close = bee_check_for_flowers(bee, map);
+			if (flower_close) {
+				int *fr = &bee->flower_location.row;
+				int *fc = &bee->flower_location.col;
+				bee_locate_flowers(bee, map, fr, fc);
+				bee->state = SEEK;
 			}
 		}
 	}
