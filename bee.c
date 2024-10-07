@@ -30,15 +30,6 @@ void bee_free_flower_path(Trajectory ** flower_path, int len) {
 	}
 	free(flower_path);
 }
-/* - if bee lands on flower and doesnt already have pollen, collect one pollen */ 
-/* - if 2+ bees land on flower: */
-/*     - enough pollen for all: each gets one */
-/*     - not enough: no pollen collected (pollen destroyed?), bees continue as if not on flower */
-/* - if bee lands on wasp hive, it dies */
-/* - if bee lands at same place as wasp, it dies */
-/* - bees that die with pollen destroy pollen */
-/* - if bee lands on flower with wasp: bees die and flower keeps its pollen */
-/* - if 2+ bee scouts inform of a flower at same time, foragers go to closest one */
 void bee_action(Bee * bee, Map *map) {
 	Cell *cell;
 	Cell *next_cell;
@@ -54,7 +45,6 @@ void bee_action(Bee * bee, Map *map) {
 	/* printf("Doing bee action: %c %d %d\n", cell->display_char, r, c ); */
 
 	//Special behaviours
-
 	// Dying on wasp hive is the same for all bees
 	if (cell->display_char == 'W') {
 		remove_bee_from_cell(&next_cell->bee_head_ptr, *bee);
@@ -81,7 +71,8 @@ void bee_action(Bee * bee, Map *map) {
 		pollen_len = cell->flower_ptr->pollen_len;
 
 		if (bee->type == DESERT && pollen_len <= 0) {
-			bee->flower_path = {0};
+			// Cant actually easliy reset array, so will just try overwrite stuff
+			/* bee->flower_path = {0}; */
 			bee->flower_path_len = 0;
 			bee->flower_path_index = -1;
 			bee->state = RETURN;
@@ -204,7 +195,7 @@ void desert_bee_action(Bee *bee, Map *map) {
 			bee->pollen.string_info[0] != '\0';
 			hive_add_pollen(bee->hive_ptr, bee->pollen);
 
-			if (bee->flower_pollen_len > 0) bee->state = PATH;
+			if (bee->flower_path_len > 0) bee->state = PATH;
 			else bee->state = WANDER;
 		}
 		return;

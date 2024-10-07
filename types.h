@@ -22,6 +22,10 @@ enum BeeRole { FORAGER, SCOUT };
 enum BeeType { NORMAL, HONEY, DESERT };
 enum PollinatorState { WANDER, RETURN, SEEK, DORMANT, PATH };
 
+typedef struct {
+	int distance;
+	float direction;
+} Trajectory;
 
 union Pollen {
 	float float_info;
@@ -43,7 +47,7 @@ typedef struct {
 	union Pollen pollen[MAX_FLOWER_POLLEN];
 } Hive;
 
-typedef struct Bee {
+typedef struct  {
 	int id;
 	int row;
 	int col;
@@ -95,9 +99,5 @@ typedef struct {
 	union Pollen pollen[MAX_FLOWER_POLLEN];
 } Flower;
 
-typedef struct {
-	int distance;
-	float direction;
-} Trajectory;
 
 #endif
