@@ -80,6 +80,14 @@ void bee_action(Bee * bee, Map *map) {
 
 		pollen_len = cell->flower_ptr->pollen_len;
 
+		if (bee->type == DESERT && pollen_len <= 0) {
+			bee->flower_path = {0};
+			bee->flower_path_len = 0;
+			bee->flower_path_index = -1;
+			bee->state = RETURN;
+			return;
+		}
+
 		if (total_bees_count > pollen_len && this_bee_pos == 0) {
 			cell->flower_ptr->fight = true;
 		}
@@ -119,12 +127,15 @@ void normal_bee_action(Bee *bee, Map *map) {
 	bool flower_close = bee_check_for_flowers(bee, map);
 	if (bee->state == RETURN) {
 		if (bee->row == bee->hive_ptr->row && bee->col == bee->hive_ptr->col) {
+			bool has_pollen = bee->pollen.string_info[0] != '\0';
+			bee->pollen.string_info[0] != '\0';
 			// Add pollen to hive
-			hive_add_pollen(bee->hive_ptr, bee->pollen);
+			if (has_pollen) hive_add_pollen(bee->hive_ptr, bee->pollen);
 			bee->state = WANDER;
 		}
 		return;
 	}
+	if (bee->state == SEEK && !flower_close) bee->state = WANDER;
 	if (flower_close) bee->state = SEEK;
 	else bee->state = WANDER;
 }
@@ -170,12 +181,33 @@ void honey_bee_action(Bee *bee, Map *map) {
 	if (bee->role == FORAGER) {
 		if (bee->state == RETURN) {
 			if (r == bee->hive_ptr->row && c == bee->hive_ptr->col) {
-				hive_add_pollen(bee->hive_ptr, bee->pollen);
+
+				bool has_pollen = bee->pollen.string_info[0] != '\0';
+				bee->pollen.string_info[0] != '\0';
+				if (has_pollen) hive_add_pollen(bee->hive_ptr, bee->pollen);
+
 				bee->flower_location.row = MAX_MAP_SIZE+1;
 				bee->flower_location.col = MAX_MAP_SIZE+1;
 				bee->state = DORMANT;
 			}
 		}
+	}
+}
+
+void desert_bee_action(Bee *bee, Map *map) {
+	if (bee->state == RETURN) {
+		if (bee->row == bee->hive_ptr->row && bee->col == bee->hive_ptr->col) {
+			// Add pollen to hive
+			// Should only happen when bee has pollen
+			// Set pollen to "/0" whenever we drop off pollen
+			bool has_pollen = bee->pollen.string_info[0] != '\0';
+			bee->pollen.string_info[0] != '\0';
+			hive_add_pollen(bee->hive_ptr, bee->pollen);
+
+			if (bee->flower_pollen_len > 0) bee->state = PATH;
+			else bee->state = WANDER;
+		}
+		return;
 	}
 }
 

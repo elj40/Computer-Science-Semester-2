@@ -9,6 +9,7 @@
 #define MAX_BEE_POLLEN 200
 #define MAX_POLLEN_LEN 100
 #define MAX_POLLEN_CHARS 50
+#define MAX_BEE_PATH 100
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
@@ -19,7 +20,7 @@ enum PollenType { FLOAT, STRING };
 enum BeehiveAction { MAX, MIN, SUM, SORT };
 enum BeeRole { FORAGER, SCOUT };
 enum BeeType { NORMAL, HONEY, DESERT };
-enum PollinatorState { WANDER, RETURN, SEEK, DORMANT };
+enum PollinatorState { WANDER, RETURN, SEEK, DORMANT, PATH };
 
 
 union Pollen {
@@ -50,7 +51,7 @@ typedef struct Bee {
 	int perception;
 
 	Point flower_location;
-	Trajectory * flower_path;
+	Trajectory flower_path[MAX_BEE_PATH];
 	int flower_path_len;
 	int flower_path_index;
 

@@ -87,6 +87,8 @@ void free_map(Map *map) {
 	}
 }
 
+//TODO: make sure foragers bees take bottom left flower
+// Not sure what the initial value of flower location is
 void wake_up_honey_bees_in_cell(Cell *c, int fr, int fc) {
 	BeeNode * current = c->bee_head_ptr;
 	while (current) {
