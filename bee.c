@@ -71,14 +71,6 @@ void bee_action(Bee * bee, Map *map) {
 
 		pollen_len = cell->flower_ptr->pollen_len;
 
-		if (bee->type == DESERT && pollen_len <= 0) {
-			// Cant actually easliy reset array, so will just try overwrite stuff
-			/* bee->flower_path = {0}; */
-			bee->flower_path_len = 0;
-			bee->flower_path_index = -1;
-			bee->state = RETURN;
-			return;
-		}
 
 		if (total_bees_count > pollen_len && this_bee_pos == 0) {
 			cell->flower_ptr->fight = true;
@@ -192,7 +184,6 @@ void desert_bee_action(Bee *bee, Map *map) {
 	if (bee->state == SEEK) {}
 	if (bee->state == PATH) {}
 
-	printf("Desert bee path len: %d\n", bee->flower_path_len);
 
 	if (bee->state == RETURN) {
 		if (bee->row == bee->hive_ptr->row && bee->col == bee->hive_ptr->col) {
@@ -200,16 +191,26 @@ void desert_bee_action(Bee *bee, Map *map) {
 			// Should only happen when bee has pollen
 			// Set pollen to "/0" whenever we drop off pollen
 			bool has_pollen = bee->pollen.string_info[0] != '\0';
-			bee->pollen.string_info[0] != '\0';
-			hive_add_pollen(bee->hive_ptr, bee->pollen);
+			if (bee->pollen.string_info[0] != '\0') hive_add_pollen(bee->hive_ptr, bee->pollen);
 
 			if (bee->flower_path_len > 0) bee->state = PATH;
 			else bee->state = WANDER;
 		}
 		return;
 	}
+
+	if (bee->state == PATH) {
+		Cell c = map->map[bee->row][bee->col];
+		if (c.display_char == 'F' && c.flower_ptr->pollen_len <= 0) {
+			printf("Resetting flower path\n");
+			bee->flower_path_len = 0;
+			bee->flower_path_index = -1;
+			bee->state = RETURN;
+			return;
+		}
+	}
 	if (flower_close) bee->state = SEEK;
-	else bee->state = WANDER;
+	else if (!flower_close && bee->state != PATH) bee->state = WANDER;
 }
 
 void bee_land_on_flower(Bee *bee, Cell *cell) {
@@ -323,7 +324,7 @@ Trajectory honey_bee_get_next_trajectory(Bee *bee, Map *map) {
 Trajectory desert_bee_get_next_trajectory(Bee *bee, Map *map) {
 	int flower_r, flower_c;
 	if (bee->state == WANDER) {
-		//add to path array
+		// add to path array
 		// increment path length
 		// make sure path index is still -1
 		Trajectory rand_traj = get_random_trajectory(bee->speed);
@@ -343,19 +344,35 @@ Trajectory desert_bee_get_next_trajectory(Bee *bee, Map *map) {
 		return get_trajectory_from_target(bee->row, bee->col, bee->speed, hive_r, hive_c);
 	}
 	else if (bee->state == SEEK) {
-		printf("Desert bee seeking\n");
+
 		bee_locate_flowers(bee, map, &flower_r, &flower_c);
-		return get_trajectory_from_target(bee->row, bee->col, bee->speed,flower_r, flower_c);
+		Trajectory target_traj = get_trajectory_from_target(bee->row, bee->col, bee->speed,flower_r, flower_c);
+
+		bee->flower_path[bee->flower_path_len] = target_traj;
+		bee->flower_path_len++;
+		bee->flower_path_index = -1;
+		printf("Path Trajectory-> dist: %d dir: %f\n", target_traj.distance, target_traj.direction / 3.14259 * 180);
+
+		printf("Desert bee seeking\n");
+		return target_traj;
 	}
 	else if (bee->state == PATH) {
+
 		printf("Desert bee pathing\n");
+
 		bee_locate_flowers(bee, map, &flower_r, &flower_c);
 		bee->flower_path_index++;
 		int i = bee->flower_path_index;
+
+		printf("Desert bee path len: %d\n", bee->flower_path_len);
+		printf("Desert bee path index %d\n", i);
+
 		if (i <= -1 || i >= bee->flower_path_len) {
 			printf("-------->WE SHOULD NOT HAVE THIS INDEX!!! %d\n", i);
 		}
 		Trajectory t = bee->flower_path[i];
+
+		printf("Path Trajectory-> dist: %d dir: %f\n", t.distance, t.direction / 3.14259 * 180);
 		return t;
 	}
 	
