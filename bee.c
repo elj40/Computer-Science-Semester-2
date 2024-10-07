@@ -11,6 +11,7 @@
 #include "bee.h"
 
 void honey_bee_action(Bee *bee, Map *map);
+void desert_bee_action(Bee *bee, Map *map);
 void bee_land_on_flower(Bee *bee, Cell *cell);
 void print_bee(Bee b) {
 	printf("Bee:\tr:%d c:%d p:%d id:%d type:%d state:%d\n", b.row, b.col, b.perception, b.id, b.type, b.state);
@@ -97,6 +98,7 @@ void bee_action(Bee * bee, Map *map) {
 	
 	if (bee->type == NORMAL) normal_bee_action(bee, map);
 	else if (bee->type == HONEY) honey_bee_action(bee, map);
+	else if (bee->type == DESERT) desert_bee_action(bee, map);
 }
 
 void hive_add_pollen(Hive *hive, union Pollen pollen) {
@@ -125,7 +127,6 @@ void normal_bee_action(Bee *bee, Map *map) {
 		}
 		return;
 	}
-	if (bee->state == SEEK && !flower_close) bee->state = WANDER;
 	if (flower_close) bee->state = SEEK;
 	else bee->state = WANDER;
 }
@@ -185,9 +186,14 @@ void honey_bee_action(Bee *bee, Map *map) {
 }
 
 void desert_bee_action(Bee *bee, Map *map) {
+	bool flower_close = bee_check_for_flowers(bee, map);
+
 	if (bee->state == WANDER) {}
 	if (bee->state == SEEK) {}
 	if (bee->state == PATH) {}
+
+	printf("Desert bee path len: %d\n", bee->flower_path_len);
+
 	if (bee->state == RETURN) {
 		if (bee->row == bee->hive_ptr->row && bee->col == bee->hive_ptr->col) {
 			// Add pollen to hive
@@ -202,6 +208,8 @@ void desert_bee_action(Bee *bee, Map *map) {
 		}
 		return;
 	}
+	if (flower_close) bee->state = SEEK;
+	else bee->state = WANDER;
 }
 
 void bee_land_on_flower(Bee *bee, Cell *cell) {
@@ -323,19 +331,25 @@ Trajectory desert_bee_get_next_trajectory(Bee *bee, Map *map) {
 		bee->flower_path_len++;
 		bee->flower_path_index = -1;
 
+		printf("Desert bee wandering\n");
+
 		return rand_traj;
 	}
 	else if (bee->state == RETURN) {
 		int hive_r = bee->hive_ptr->row;
 		int hive_c = bee->hive_ptr->col;
+		printf("Desert bee returning\n");
 
 		return get_trajectory_from_target(bee->row, bee->col, bee->speed, hive_r, hive_c);
 	}
 	else if (bee->state == SEEK) {
+		printf("Desert bee seeking\n");
 		bee_locate_flowers(bee, map, &flower_r, &flower_c);
 		return get_trajectory_from_target(bee->row, bee->col, bee->speed,flower_r, flower_c);
 	}
 	else if (bee->state == PATH) {
+		printf("Desert bee pathing\n");
+		bee_locate_flowers(bee, map, &flower_r, &flower_c);
 		bee->flower_path_index++;
 		int i = bee->flower_path_index;
 		if (i <= -1 || i >= bee->flower_path_len) {
@@ -352,6 +366,9 @@ Trajectory bee_get_next_trajectory(Bee *bee,  Map *map) {
 	}
 	else if (bee->type == HONEY) {
 		return honey_bee_get_next_trajectory(bee, map);
+	}
+	else if (bee->type == DESERT) {
+		return desert_bee_get_next_trajectory(bee, map);
 	}
 }
 
@@ -382,7 +399,8 @@ bool bee_check_for_flowers(Bee *bee, Map *m) {
 
 	for (int y = bottom; y <= top; y++) {
 		for (int x = left; x <= right; x++) {
-			if (m->map[y][x].display_char == 'F') return true;
+			Cell c = m->map[y][x];
+			if (c.display_char == 'F' && c.flower_ptr->pollen_len > 0) return true;
 		}
 	}
 
@@ -419,7 +437,8 @@ void bee_locate_flowers(Bee *bee, Map *m, int *fr, int *fc) {
 
 	for (int y = bottom; y <= top; y++) {
 		for (int x = left; x <= right; x++) {
-			if (m->map[y][x].display_char == 'F') {
+			Cell cell = m->map[y][x];
+			if (cell.display_char == 'F' && cell.flower_ptr->pollen_len > 0) {
 				int dist = MAX(abs(y-r),abs(c-x));
 				if (dist < min_dist) {
 					*fr = y;
